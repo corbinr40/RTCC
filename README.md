@@ -1,0 +1,2 @@
+# RTCC
+A piece of software that converts voice to text in a visual output, as an aid to individuals who are hard of hearing. The plan is to deliver this via a piece of hardware in the form of glasses with a heads up display. However a fallback of this would be an app that fulfils this. The system will work by using facial detection to track who is talking to place the converted audio appropriately. 
