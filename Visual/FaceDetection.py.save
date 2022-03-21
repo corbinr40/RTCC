@@ -1,0 +1,42 @@
+#Pi Specific
+from picamera.array import PiRGBArray
+from picamera.array import PiCamera
+
+import numpy.core.multiarray
+import cv2
+
+try:
+    #Load the cascade data set
+    face_cascade = cv2.CascadeClassifier('cascade.xml')
+
+    #To capture video from webcam
+	cap = cv2.VideoCapture(0)
+
+
+    while True:
+        #Read the frame
+        _,img = cap.read()
+        #convert to grayscale
+        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        #Detect the face
+        faces = face_cascade.detectMultiScale(gray,1.1, 4)
+        #Draw the rectangle around each face
+        for (x, y, w, h) in faces:
+            startPoint = (x,y)
+            endPoint = (x+w, y+h)
+            cv2.rectangle(img, startPoint, endPoint, (255, 0, 0), 2)
+            print("Start Point: ", startPoint," End Point: ", endPoint)
+            print("X: ", x," Y: ", y, " W: ", w," H: ", h)
+        #Display
+        cv2.imshow('img', img)
+        #Stop if escape is pressed
+        k = cv2.waitKey(30) & 0xff
+        if k==27:
+            cv2.destroyAllWindows()
+            break
+except:
+    #Release the VideoCapture object
+    cap.release()
+
+#Start Point:(456,366)
+#End Point: (622,532)
