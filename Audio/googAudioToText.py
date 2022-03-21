@@ -5,7 +5,7 @@ from pydub import AudioSegment
 #creates object of speach recogniser
 r = sr.Recognizer()
 #read audio file into an audio variable
-with sr.AudioFile('C:\\Users\\Jorda\\OneDrive\\Desktop\\RTCC-main\\output.wav') as source: 
+with sr.AudioFile('C:\\Users\\Jordan\\RTCC\\output.wav') as source: 
         audio = r.listen(source)
         try:
                 #can change google to other later
