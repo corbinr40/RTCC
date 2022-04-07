@@ -1,103 +1,105 @@
-''' 
-  This is a virtual assistant program that will listen for a wake word and once triggered it will process some commands to 
-  alter settings, begin capturing audio and stop capturing audio
-'''
-#import the libraries needed
-import pyttsx3 as p 
 import speech_recognition as sr
-import pywhatkit 
+import pyttsx3
 import datetime
-import wikipedia
-import pyjokes 
+import pyjokes
+#import gui # import the gui file/class
 
-#create listener
-r = sr.Recognizer()
-#initialise the engine
-engine = p.init()
-#set the speed of the audio
-rate = engine.getProperty('rate')
-engine.setProperty('rate',200)
-#set the voice
+##Creating an array for commands
+import re
+import sys
+import array
+
+listener = sr.Recognizer()
+engine = pyttsx3.init()
 voices = engine.getProperty('voices')
-engine.setProperty('voice',voices[1].id)
+engine.setProperty('voice', voices[1].id)
 
-#function for getting the virtual assistant to speak
-def speak(text):
-  engine.say(text)
-  #asks computer to wait till sentance is finished
-  engine.runAndWait() 
+#running = True
 
-#function called when a command prompts the Virtual Assistant to begin listening
-def take_Command():
-  try:
-    with sr.Microphone() as source:
-      #set spectrum range of voice capture
-      r.energy_threshold = 10000
-      #remove background noise
-      r.adjust_for_abient_noise(source,1.2)
-      print("listening ... ")
-      #capture the audio 
-      audio = r.listen(source)
-      #send it to the google engine for speech to text
-      command = r.recognize_google(audio)
-      command = command.lower()
-      #if the key word is in the command 
-      if 'alexa' in command:
-        command = command.replace('alexa','') ##########################replace with our key word
-        print(command)
-  except:
-    pass
-  return command 
 
-#function called to take command from the user
-def run_assistant():
-  command = take_Command()
-  ############################################ REMOVE (just here for testing)
-  print(command)
-  if 'play' in command:
-    song = command.replace('play', '')
-    speak("now playing " + song)
-    pywhatkit.playonyt(song)
-  elif 'time' in command:
-    time = datetime.datetime.now().strftime('%H:%M')
-    speak('the time currently is' + time)
-  elif 'wikipedia' in command:
-    Question = command.replace('wikipedia','')
-    info = wikipedia.summary(Question,1)
-    speak(info)
-  elif 'joke' in command:  
-    speak(pyjokes.get_joke())
-  ######################################################################################
-  #will call code for setting the text size
-  elif 'text' and 'size' in command:  
-    pass
-  #will call code for setting the text colour
-  elif 'text' and 'colour' | 'text' and 'color' in command:  
-    pass
-  #will call code for setting the text position
-  elif 'text' and 'left' | 'text' and 'right' | 'text' and 'middle' in command:  
-    pass
-  #will call code responsible for starting the audio listening for converstion 
-  elif 'conversation' and 'started' in command:  
-    pass
-  #will call code responsible for stopping the audio listening for converstion 
-  elif 'conversation' and 'ended' in command:  
-    pass
-  #will call code responsible for turning face detection on/off
-  elif 'face' and 'detection' in command:  
-    pass
-  else:
-    speak('Please repeate that command')  
+def talk(text):
+    engine.say(text)
+    engine.runAndWait()
+
+def takeCommand():
+    try:
+        with sr.Microphone() as source:
+            listener.energy_threshold = 10000
+            listener.adjust_for_ambient_noise(source, 1.2)
+            print('listening...')
+            voice = listener.listen(source)
+            command = listener.recognize_google(voice)
+            command = command.lower()
+            if 'alexa' in command:
+                command = command.replace('alexa', '')
+##                print(command)
+                executeCommand(command)
+    except:
+        pass
     
-while True:
-  run_assistant()
+def executeCommand(command):
+    print(command)
+    # will call the code to display the date and time
+    if 'time' in command:
+        time = datetime.datetime.now().strftime('%I:%M %p')
+        talk('Current time is ' + time)
+    elif 'joke' in command:
+        talk(pyjokes.get_joke())
+    # will call code for setting the text size
+    elif 'size' in command:
+        fontSize = re.sub('\D', '', command)
+        print(fontSize)
+        talk(fontSize)
+    ##    fontSize = array.array('i')
+    ##    #fontSize = [command.replace('text', '').replace('size', '')]
+    ##    fontSizeInt = command.replace('text', '').replace('size', '')
+    ##    fontSize.insert(0, type(int(fontSizeInt)))
+    ##    print(fontSize[0])
+    ##        command = command.replace('text', '')
+    ##        command = command.replace('size', '')
+    ##        if int(command)
+    ##        gui.set_text_size(int size)
+    # will call code for setting the text colour
+    elif 'colour' in command:
+        print(command)
+        #Call method in GUI class responsible for setting the text colour
+        colours['red','blue','green','black']
+        if command in colours:
+            #Check if clours
+            print("found")
+        else:
+            print("not found")
+    # will call code for setting the text position
+##    elif 'text' and 'left' | 'text' and 'right' | 'text' and 'middle' in command:
+##        #Call method in Visual GUI class to set text GUI position (user speech)
+##        pass
+    # will call code responsible for starting the audio listening for converstion
+    elif 'conversation' and 'started' in command:
+        #Call method from Audio class "Google Audio to text"
+        #Then, pass output to GUI text area (to display)
+        pass
+    # will call code responsible for stopping the audio listening for converstion
+    elif 'ended' in command:
+        #Call method to stop displaying text to GUI
+        pass
+    # will call code responsible for turning face detection on/off
+    elif 'face' and 'detection' in command:
+        #Call method to toggle face detection on/off (in visual GUI)
+        pass
+    elif 'power' and 'down' in command:
+        talk("Goodbye")
+        quit()
+        running = False
+        sys.exit("Powering Down")
+    else:
+        print("Not a command")
+        talk('Please repeate that command')
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
+if __name__ == '__main__':
+    try:
+        while True:
+            takeCommand()
+    except KeyboardInterrupt:
+        print("Raising SystemExit")
+        raise SystemExit
+    #takeCommand()
