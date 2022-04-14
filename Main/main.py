@@ -8,6 +8,7 @@
 #from tkinter import Tk, Canvas, Frame, BOTH, Menu,
 from tkinter import *
 import datetime
+import time
 
 #Modules for Face Detection
 #from tkinter import Tk, Canvas, Frame, BOTH
@@ -36,12 +37,14 @@ class Interface(Frame):
         global canvas
         global rectFace
         global videoOn
+        global voiceText
 
         #self.master.title("Face Detection")
         #self.pack(fill=BOTH, expand=1)
 
         canvas = Canvas(self)
         rectFace = canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
+        voiceText = canvas.create_text(x1, y1, fill="#ffffff", text = "")
 
         #canvas.configure(bg='black')
         #canvas.pack(fill=BOTH, expand=1)
@@ -84,8 +87,12 @@ class Interface(Frame):
     def createRect(self,x1, y1, x2, y2):
         global rectFace
         global canvas
+        global voiceText
         canvas.delete(rectFace)
+        canvas.delete(voiceText)
+        #print("x1: " + str(x1) + " y1: " + str(y1) + " x2: " + str(x2) + " y2: " + str(y2))
         rectFace = canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
+        voiceText = canvas.create_text((x2 + x1) / 2, (y2 + 25), fill="#ffffff", text="Hello")
 
     def findFace(self):
         try:
@@ -109,9 +116,11 @@ class Interface(Frame):
                 foundFace = False
                 if(findFaces == False):
                     global rectFace
+                    global voiceText
                     global canvas
                     global videoOn
                     canvas.delete(rectFace)
+                    canvas.delete(voiceText)
                     canvas.itemconfig(videoOn, fill='#000000')
                     pass
                 else:
@@ -128,6 +137,7 @@ class Interface(Frame):
                         self.values(x1, y1, x2, y2)
                     if(foundFace == False):
                         canvas.delete(rectFace)
+                        canvas.delete(voiceText)
                     
                 #Display
                 #cv2.imshow('img', img)
@@ -149,6 +159,82 @@ class Interface(Frame):
         self.createRect(x1, y1, x2, y2)
         return (x1, y1, x2, y2)
 
+    def commandsList(self):
+        #("640x480")
+        global commandListActive
+        global backgroundRec
+        global commandsTitleLabel
+        global speechLabel
+        global visionLabel
+        global settingsLabel
+        global jokesLabel
+        global commandsLabel
+        global timeLabel
+        global powerLabel
+        if(commandListActive == False):
+            backgroundRec = canvas.create_rectangle(10, 290, 200, 470, fill="#FFFFFF")
+            commandsTitleLabel = canvas.create_text(100, 305, text='Commands')
+            speechLabel = canvas.create_text(15, 330, anchor='w', text='Speech: activate speech')
+            visionLabel = canvas.create_text(15, 350, anchor='w', text='Vision: activate vision')
+            settingsLabel = canvas.create_text(15, 370, anchor='w', text='Settings: open settings')
+            jokesLabel = canvas.create_text(15, 390, anchor='w', text='Jokes: want a joke?')
+            commandsLabel = canvas.create_text(15, 410, anchor='w', text='Commands: view commands')
+            timeLabel = canvas.create_text(15, 430, anchor='w', text='Time: get current time')
+            powerLabel = canvas.create_text(15, 450, anchor='w', text='Power: power off device')
+            commandListActive = True
+
+            self.openCommandList()
+
+            #time.sleep(1)
+        else:
+            #canvas.after(2000)
+
+            canvas.delete(backgroundRec)
+            canvas.delete(commandsTitleLabel)
+            canvas.delete(speechLabel)
+            canvas.delete(visionLabel)
+            canvas.delete(settingsLabel)
+            canvas.delete(jokesLabel)
+            canvas.delete(commandsLabel)
+            canvas.delete(timeLabel)
+            canvas.delete(powerLabel)
+            commandListActive = False
+
+        #canvas.after(1000, self.commandsListClose())
+        pass
+
+    def openCommandList(self):
+        commandThread = threading.Timer(2.0, self.commandsListClose, args=())
+        commandThread.start()
+
+    def commandsListClose(self):
+        #("640x480")
+        global commandListActive
+        global backgroundRec
+        global commandsTitleLabel
+        global speechLabel
+        global visionLabel
+        global settingsLabel
+        global jokesLabel
+        global commandsLabel
+        global timeLabel
+        global powerLabel
+        if(commandListActive == True):
+            canvas.delete(backgroundRec)
+            canvas.delete(commandsTitleLabel)
+            canvas.delete(speechLabel)
+            canvas.delete(visionLabel)
+            canvas.delete(settingsLabel)
+            canvas.delete(jokesLabel)
+            canvas.delete(commandsLabel)
+            canvas.delete(timeLabel)
+            canvas.delete(powerLabel)
+            commandListActive = False
+
+        pass
+
+
+
     
 
 def donothing():
@@ -167,9 +253,22 @@ def pauseFaceDect(e):
         findFaces = False
         print("findFaces is False")
 
+#def openCommandList(ex):
+#    commandThread = threading.Timer(5.0, ex.commandsListClose, args=())
+##    commandThread.start()
+    #commandThread.cancel()
+
+    #while(commandThread.is_alive()):
+    #    print("I'm Running!!")
+    #else:
+    #    ex.commandsListClose()
+    #    pass
+
 def main():
     global root
     global findFaces
+    global commandListActive
+    commandListActive = False
     findFaces = False
     
     x1 = 0
@@ -185,6 +284,9 @@ def main():
     root.attributes("-fullscreen", True)
 
     root.bind("o", lambda e: pauseFaceDect(e))
+    root.bind("s", lambda e: print("Settings"))
+    #root.bind("c", lambda e:  openCommandList(ex))
+    root.bind("c", lambda e:  ex.commandsList())
     root.bind("<Escape>", lambda e: closeProgram(e))
     root.mainloop()
 

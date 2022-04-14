@@ -2,7 +2,7 @@
 from cgitb import text
 from email.policy import default
 from multiprocessing.sharedctypes import Value
-from this import d
+#from this import d
 from tkinter import * 
 from tkinter import font
 from tkinter import colorchooser
@@ -80,6 +80,7 @@ def all_text_colour():
   #pick a colour
   text_colour = colorchooser.askcolor()[1] 
   if text_colour:
+    print(text_colour)
     text_output.config(fg=text_colour)
 
 #change the background colour

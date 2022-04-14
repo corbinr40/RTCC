@@ -11,7 +11,7 @@ import array
 
 
 #from FaceGUI.py import main
-import FaceGUI as face
+#import FaceGUI as face
 
 listener = sr.Recognizer()
 engine = pyttsx3.init()
@@ -85,7 +85,8 @@ def executeCommand(command):
 ##        else:
 ##            faceDetect = True
 ##        faceToggle(faceDetect
-        face.main()
+        #face.main()
+        pass
     elif 'power' and 'down' in command:
         talk("Goodbye")
         quit()
