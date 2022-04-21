@@ -99,12 +99,13 @@ class Interface(Frame):
         #self.master.title("Face Detection")
         #self.pack(fill=BOTH, expand=1)
 
-        canvas = Canvas(self)
-        rectFace = canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
-        voiceText = canvas.create_text(x1, y1, fill="#ffffff", text = "")
+        self.canvas = Canvas(self, width=640, height=480, background='black')
+        self.canvas.grid()
+        rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
+        voiceText = self.canvas.create_text(x1, y1, fill="#ffffff", text = "")
 
-        #canvas.configure(bg='black')
-        #canvas.pack(fill=BOTH, expand=1)
+        #self.canvas.configure(bg='black')
+        #self.canvas.pack(fill=BOTH, expand=1)
 
         ##Menu Bar Frame
         menubarFrame = LabelFrame(root, bg="white")
@@ -122,8 +123,8 @@ class Interface(Frame):
         self.currentPower()
 
         ##Recording Audio / Camera
-        audioOn = canvas.create_oval(620, 460, 640, 480, fill="#F85E2B", width=2)
-        videoOn = canvas.create_oval(590, 460, 610, 480, fill="#000000", width=2)
+        audioOn = self.canvas.create_oval(620, 460, 640, 480, fill="#F85E2B", width=2)
+        videoOn = self.canvas.create_oval(590, 460, 610, 480, fill="#000000", width=2)
 
         
 
@@ -133,8 +134,8 @@ class Interface(Frame):
 
         #canvas = Canvas(self)
 
-        canvas.configure(bg='black')
-        canvas.pack(fill=BOTH, expand=1)
+        #self.canvas.configure(bg='black')
+        #self.canvas.pack(fill=BOTH, expand=1)
 
     def currentTime(self):
         time = datetime.datetime.now().strftime('%H:%M')
@@ -165,11 +166,11 @@ class Interface(Frame):
         global rectFace
         global canvas
         global voiceText
-        canvas.delete(rectFace)
-        canvas.delete(voiceText)
+        self.canvas.delete(rectFace)
+        self.canvas.delete(voiceText)
         #print("x1: " + str(x1) + " y1: " + str(y1) + " x2: " + str(x2) + " y2: " + str(y2))
-        rectFace = canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
-        voiceText = canvas.create_text((x2 + x1) / 2, (y2 + 25), fill="#ffffff", text="Hello")
+        rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
+        voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill="#ffffff", text="Hello")
 
     def findFace(self):
         try:
@@ -196,12 +197,12 @@ class Interface(Frame):
                     global voiceText
                     global canvas
                     global videoOn
-                    canvas.delete(rectFace)
-                    canvas.delete(voiceText)
-                    canvas.itemconfig(videoOn, fill='#000000')
+                    self.canvas.delete(rectFace)
+                    self.canvas.delete(voiceText)
+                    self.canvas.itemconfig(videoOn, fill='#000000')
                     pass
                 else:
-                    canvas.itemconfig(videoOn, fill='#89E039')
+                    self.canvas.itemconfig(videoOn, fill='#89E039')
                     for (x, y, w, h) in faces:
                         startPoint = (x, y)
                         endPoint = (x + w, y + h)
@@ -213,8 +214,8 @@ class Interface(Frame):
                         foundFace = True
                         self.values(x1, y1, x2, y2)
                     if(foundFace == False):
-                        canvas.delete(rectFace)
-                        canvas.delete(voiceText)
+                        self.canvas.delete(rectFace)
+                        self.canvas.delete(voiceText)
                     
                 #Display
                 #cv2.imshow('img', img)
@@ -249,35 +250,35 @@ class Interface(Frame):
         global timeLabel
         global powerLabel
         if(commandListActive == False):
-            backgroundRec = canvas.create_rectangle(10, 290, 200, 470, fill="#FFFFFF")
-            commandsTitleLabel = canvas.create_text(100, 305, text='Commands')
-            speechLabel = canvas.create_text(15, 330, anchor='w', text='Speech: activate speech')
-            visionLabel = canvas.create_text(15, 350, anchor='w', text='Vision: activate vision')
-            settingsLabel = canvas.create_text(15, 370, anchor='w', text='Settings: open settings')
-            jokesLabel = canvas.create_text(15, 390, anchor='w', text='Jokes: want a joke?')
-            commandsLabel = canvas.create_text(15, 410, anchor='w', text='Commands: view commands')
-            timeLabel = canvas.create_text(15, 430, anchor='w', text='Time: get current time')
-            powerLabel = canvas.create_text(15, 450, anchor='w', text='Power: power off device')
+            backgroundRec = self.canvas.create_rectangle(10, 290, 200, 470, fill="#FFFFFF")
+            commandsTitleLabel = self.canvas.create_text(100, 305, text='Commands')
+            speechLabel = self.canvas.create_text(15, 330, anchor='w', text='Speech: activate speech')
+            visionLabel = self.canvas.create_text(15, 350, anchor='w', text='Vision: activate vision')
+            settingsLabel = self.canvas.create_text(15, 370, anchor='w', text='Settings: open settings')
+            jokesLabel = self.canvas.create_text(15, 390, anchor='w', text='Jokes: want a joke?')
+            commandsLabel = self.canvas.create_text(15, 410, anchor='w', text='Commands: view commands')
+            timeLabel = self.canvas.create_text(15, 430, anchor='w', text='Time: get current time')
+            powerLabel = self.canvas.create_text(15, 450, anchor='w', text='Power: power off device')
             commandListActive = True
 
             self.openCommandList()
 
             #time.sleep(1)
         else:
-            #canvas.after(2000)
+            #self.canvas.after(2000)
 
-            canvas.delete(backgroundRec)
-            canvas.delete(commandsTitleLabel)
-            canvas.delete(speechLabel)
-            canvas.delete(visionLabel)
-            canvas.delete(settingsLabel)
-            canvas.delete(jokesLabel)
-            canvas.delete(commandsLabel)
-            canvas.delete(timeLabel)
-            canvas.delete(powerLabel)
+            self.canvas.delete(backgroundRec)
+            self.canvas.delete(commandsTitleLabel)
+            self.canvas.delete(speechLabel)
+            self.canvas.delete(visionLabel)
+            self.canvas.delete(settingsLabel)
+            self.canvas.delete(jokesLabel)
+            self.canvas.delete(commandsLabel)
+            self.canvas.delete(timeLabel)
+            self.canvas.delete(powerLabel)
             commandListActive = False
 
-        #canvas.after(1000, self.commandsListClose())
+        #self.canvas.after(1000, self.commandsListClose())
         pass
 
     def openCommandList(self):
@@ -297,15 +298,15 @@ class Interface(Frame):
         global timeLabel
         global powerLabel
         if(commandListActive == True):
-            canvas.delete(backgroundRec)
-            canvas.delete(commandsTitleLabel)
-            canvas.delete(speechLabel)
-            canvas.delete(visionLabel)
-            canvas.delete(settingsLabel)
-            canvas.delete(jokesLabel)
-            canvas.delete(commandsLabel)
-            canvas.delete(timeLabel)
-            canvas.delete(powerLabel)
+            self.canvas.delete(backgroundRec)
+            self.canvas.delete(commandsTitleLabel)
+            self.canvas.delete(speechLabel)
+            self.canvas.delete(visionLabel)
+            self.canvas.delete(settingsLabel)
+            self.canvas.delete(jokesLabel)
+            self.canvas.delete(commandsLabel)
+            self.canvas.delete(timeLabel)
+            self.canvas.delete(powerLabel)
             commandListActive = False
 
         pass

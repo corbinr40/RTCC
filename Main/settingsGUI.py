@@ -4,6 +4,8 @@ from tkinter import *
 import platform
 import configparser
 
+from numpy import column_stack
+
 global fontSize
 global fontColour
 global wakeWord
@@ -28,11 +30,13 @@ wakeWord = config['USER SETTINGS']['wakeWord']
 #win.mainloop()
 
 
-class Settings(Frame):
+class Settings():
 
-    def __init__(sett):
-        super().__init__()
+    def __init__(sett, window):
+        #super().__init__()
         #window = Tk()  # Creating instance of Tk class
+
+        sett.window = window
 
 
         window.title("Settings")
@@ -50,34 +54,37 @@ class Settings(Frame):
         window.geometry("{}x{}+{}+{}".format(window_width,
                     window_height, x_cordinate, y_cordinate))
 
-        sett.settingsTitleLabel = Label(text='Settings', font=('', (int(fontSize) * (2))), fg= fontColour)
-        sett.settingsTitleLabel.pack(side= TOP, fill= X)
+        frame = Frame(sett.window)
+        frame.grid(row = 0, column= 0)
 
-        sett.fontSizeLabel = Label(text='Font Size:', font=('', fontSize), fg=fontColour)
-        sett.fontSizeLabel.pack(row=1, column=0)
+        sett.settingsTitleLabel = Label(frame, text='Settings', font=('', (int(fontSize) * (2))), fg= fontColour)
+        sett.settingsTitleLabel.grid(row=0, column=1, columnspan=2)
 
-        sett.currentFontSizeLabel = Label(text=fontSize, font=('', fontSize), fg=fontColour)
-        sett.currentFontSizeLabel.pack(row=1, column=1)
+        sett.fontSizeLabel = Label(frame, text='Font Size:', font=('', fontSize), fg=fontColour)
+        sett.fontSizeLabel.grid(row=1, column=0)
 
-        sett.fontColourLabel = Label(text='Font Colour:', font=('', fontSize), fg=fontColour)
-        sett.fontColourLabel.pack(row=2, column=0)
+        sett.currentFontSizeLabel = Label(frame, text=fontSize, font=('', fontSize), fg=fontColour)
+        sett.currentFontSizeLabel.grid(row=1, column=1)
 
-        sett.currentFontColourLabel = Label( text=fontColour, font=('', fontSize), fg=fontColour)
-        sett.currentFontColourLabel.pack(row=2, column=1)
+        sett.fontColourLabel = Label(frame, text='Font Colour:', font=('', fontSize), fg=fontColour)
+        sett.fontColourLabel.grid(row=2, column=0)
 
-        sett.wakeWordLabel = Label(text='Wake Word:', font=('', fontSize), fg=fontColour)
-        sett.wakeWordLabel.pack(row=3, column=0)
+        sett.currentFontColourLabel = Label( frame, text=fontColour, font=('', fontSize), fg=fontColour)
+        sett.currentFontColourLabel.grid(row=2, column=1)
 
-        sett.currentWakeWordLabel = Label( text=wakeWord, font=('', fontSize), fg=fontColour)
-        sett.currentWakeWordLabel.pack(row=3, column=1)
+        sett.wakeWordLabel = Label(frame, text='Wake Word:', font=('', fontSize), fg=fontColour)
+        sett.wakeWordLabel.grid(row=3, column=0)
 
-        sett.powerLabel = Label(text='Power', font=('', fontSize), fg=fontColour)
-        sett.powerLabel.pack(row=4, column=0)
+        sett.currentWakeWordLabel = Label( frame, text=wakeWord, font=('', fontSize), fg=fontColour)
+        sett.currentWakeWordLabel.grid(row=3, column=1)
 
-        sett.closeLabel = Label(text='Close', font=('', fontSize), fg=fontColour)
-        sett.closeLabel.pack(row=5, column=0)
+        sett.powerLabel = Label(frame, text='Power', font=('', fontSize), fg=fontColour)
+        sett.powerLabel.grid(row=4, column=0)
 
-        #sett.pack()
+        sett.closeLabel = Label(frame, text='Close', font=('', fontSize), fg=fontColour)
+        sett.closeLabel.grid(row=5, column=0)
+
+        #sett.grid()
     
     def fontColourBlue(sett):
         print("Shift I pressed for Blue")
@@ -92,7 +99,7 @@ class Settings(Frame):
         print("Shift P pressed for Red")
         global fontColour
         fontColour = 'red'
-        sett.currentFontColourLabel.config(text=fontColour)
+        sett.currentFontColourLabel.config(text = fontColour)
         sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
         pass
@@ -101,7 +108,7 @@ class Settings(Frame):
         print("Shift O pressed for Green")
         global fontColour
         fontColour = 'green'
-        sett.currentFontColourLabel.config(text=fontColour)
+        sett.currentFontColourLabel.config(text = fontColour)
         sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
         pass
@@ -110,7 +117,7 @@ class Settings(Frame):
         print("Shift U pressed for Black")
         global fontColour
         fontColour = 'black'
-        sett.currentFontColourLabel.config(text=fontColour)
+        sett.currentFontColourLabel.config(text = fontColour)
         sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
         pass
@@ -150,7 +157,7 @@ def settingsStart():
     global wakeWord
     window = Tk()
 
-    settwin = Settings()
+    settwin = Settings(window)
 
     #window.wm_attributes("-topmost", True)
     #window.attributes("-fullscreen", True)
