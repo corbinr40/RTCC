@@ -42,6 +42,10 @@ class Settings():
         frame = Frame(sett.window)
         frame.grid(row = 0, column= 0)
 
+        global fontColour
+        if(fontColour == 'white'):
+            fontColour = 'black'
+
         sett.settingsTitleLabel = Label(frame, text='Settings', font=('', (int(fontSize) * (2))), fg= fontColour)
         sett.settingsTitleLabel.grid(row=0, column=1, columnspan=2)
 
@@ -69,67 +73,70 @@ class Settings():
         sett.closeLabel = Label(frame, text='Close', font=('', fontSize), fg=fontColour)
         sett.closeLabel.grid(row=5, column=0)
 
+        if(fontColour == 'black'):
+            fontColour = 'white'
+
         #sett.grid()
     
-    def fontColourBlue(sett):
+    def fontColourBlue(sett, window):
         print("Shift I pressed for Blue")
         global fontColour
         fontColour = 'blue'
         sett.currentFontColourLabel.config(text = fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontColourRed(sett):
+    def fontColourRed(sett, window):
         print("Shift P pressed for Red")
         global fontColour
         fontColour = 'red'
         sett.currentFontColourLabel.config(text = fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontColourGreen(sett):
+    def fontColourGreen(sett, window):
         print("Shift O pressed for Green")
         global fontColour
         fontColour = 'green'
         sett.currentFontColourLabel.config(text = fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontColourBlack(sett):
-        print("Shift U pressed for Black")
+    def fontColourWhite(sett, window):
+        print("Shift U pressed for white")
         global fontColour
-        fontColour = 'black'
-        sett.currentFontColourLabel.config(text = fontColour)
-        sett.refresh()
+        fontColour = 'white'
+        sett.currentFontColourLabel.config(text=fontColour)
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontSizeIncrease(sett):
+    def fontSizeIncrease(sett, window):
         global fontSize
         if(int(fontSize) <= 38):
             fontSize = int(fontSize) + 2
-            sett.refresh()
             config.set('USER SETTINGS', 'fontSize', str(fontSize))
+            sett.refresh(window)
             pass
         pass
 
-    def fontSizeDecrease(sett):
+    def fontSizeDecrease(sett, window):
         global fontSize
         if(int(fontSize) >= 10):
             fontSize = int(fontSize) - 2
-            sett.refresh()
             config.set('USER SETTINGS', 'fontSize', str(fontSize))
+            sett.refresh(window)
             pass
         pass
 
-    def refresh(sett):
-        sett.destroy()
+    def refresh(sett, window):
+        sett.window.destroy()
         with open('settings.ini', 'w') as configfile:
             config.write(configfile)
-        sett.__init__()
+        settingsStart()
 
 
 def settingsCloseProgram(e):
@@ -152,12 +159,12 @@ def settingsStart():
         pass
 
     window.bind("<Escape>", lambda e: settingsCloseProgram(e))
-    window.bind("<P>", lambda e: settwin.fontColourRed())
-    window.bind("<O>", lambda e: settwin.fontColourGreen())
-    window.bind("<I>", lambda e: settwin.fontColourBlue())
-    window.bind("<U>", lambda e: settwin.fontColourBlack())
-    window.bind("+", lambda e: settwin.fontSizeIncrease())
-    window.bind("-", lambda e: settwin.fontSizeDecrease())
+    window.bind("<P>", lambda e: settwin.fontColourRed(window))
+    window.bind("<O>", lambda e: settwin.fontColourGreen(window))
+    window.bind("<I>", lambda e: settwin.fontColourBlue(window))
+    window.bind("<U>", lambda e: settwin.fontColourBlack(window))
+    window.bind("+", lambda e: settwin.fontSizeIncrease(window))
+    window.bind("-", lambda e: settwin.fontSizeDecrease(window))
     window.mainloop()
 
 

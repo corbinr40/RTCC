@@ -192,11 +192,12 @@ class Interface(Frame):
         global rectFace
         global canvas
         global voiceText
+        global fontColour
         self.canvas.delete(rectFace)
         self.canvas.delete(voiceText)
         #print("x1: " + str(x1) + " y1: " + str(y1) + " x2: " + str(x2) + " y2: " + str(y2))
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
-        voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill="#ffffff", text="Hello")
+        voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, text="Hello")
 
     def findFace(self):
         try:
@@ -305,38 +306,48 @@ class Interface(Frame):
             print(pyjokes.get_joke())
         # will call code for setting the text size
         elif 'size' in command:
+            if 'increase' in command:
+                Settings.fontSizeIncrease()
+                pass
+            elif 'decrease' in command:
+                Settings.fontSizeDecrease()
+                pass
             fontSize = re.sub('\D', '', command)
-            print(fontSize)
             print(fontSize)
         elif 'colour' in command:
             print(command)
             #Call method in GUI class responsible for setting the text colour
-            colours = ['red', 'blue', 'green', 'black']
+            colours = ['red', 'blue', 'green', 'white']
             if any(r in command for r in colours):
-                print("Found")
+                if('red' in command):
+                    Settings.fontColourRed()
+                    pass
+                elif('blue' in command):
+                    Settings.fontColourBlue()
+                    pass
+                elif('green' in command):
+                    Settings.fontColourGreen()
+                    pass
+                elif('white' in command):
+                    Settings.fontColourWhite()
+                    pass
+                pass
             else:
                 print("Not Found")
 
-        # will call code for setting the text position
-    ##    elif 'text' and 'left' | 'text' and 'right' | 'text' and 'middle' in command:
-    ##        #Call method in Visual GUI class to set text GUI position (user speech)
-    ##        pass
         # will call code responsible for starting the audio listening for converstion
-        elif 'conversation' and 'started' in command:
-            output = command.replace('conversation', '').replace('started', '')
+        elif 'conversation' and 'start' in command:
+            output = command.replace('conversation', '').replace('start', '')
+            pauseAudioDect()
             #DisplayText(output, True)
     # will call code responsible for stopping the audio listening for converstion
         elif 'ended' in command:
             output = "conversation finished"
+            pauseAudioDect()
             #DisplayText(output, False)
         elif 'face' and 'detection' in command:
             #Call method to toggle face detection on/off (in visual GUI)
-            ##        if 'off' in command:
-            ##            faceDetect = False
-            ##        else:
-            ##            faceDetect = True
-            ##        faceToggle(faceDetect
-            #face.main()
+            pauseFaceDect()
             pass
         elif 'power' and 'down' in command:
             print("Goodbye")
@@ -419,13 +430,6 @@ class Interface(Frame):
 
         pass
 
-
-
-    
-
-def donothing():
-        x = 0
-    
 
 def closeProgram(e):
     root.destroy()
@@ -515,6 +519,10 @@ class Settings():
         frame = Frame(sett.window)
         frame.grid(row=0, column=0)
 
+        global fontColour
+        if(fontColour == 'white'):
+            fontColour = 'black'
+
         sett.settingsTitleLabel = Label(frame, text='Settings', font=(
             '', (int(fontSize) * (2))), fg=fontColour)
         sett.settingsTitleLabel.grid(row=0, column=1, columnspan=2)
@@ -551,67 +559,70 @@ class Settings():
                                 font=('', fontSize), fg=fontColour)
         sett.closeLabel.grid(row=5, column=0)
 
+        if(fontColour == 'black'):
+            fontColour = 'white'
+
         #sett.grid()
 
-    def fontColourBlue(sett):
+    def fontColourBlue(sett, window):
         print("Shift I pressed for Blue")
         global fontColour
         fontColour = 'blue'
         sett.currentFontColourLabel.config(text=fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontColourRed(sett):
+    def fontColourRed(sett, window):
         print("Shift P pressed for Red")
         global fontColour
         fontColour = 'red'
         sett.currentFontColourLabel.config(text=fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontColourGreen(sett):
+    def fontColourGreen(sett, window):
         print("Shift O pressed for Green")
         global fontColour
         fontColour = 'green'
         sett.currentFontColourLabel.config(text=fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontColourBlack(sett):
-        print("Shift U pressed for Black")
+    def fontColourWhite(sett, window):
+        print("Shift U pressed for white")
         global fontColour
-        fontColour = 'black'
+        fontColour = 'white'
         sett.currentFontColourLabel.config(text=fontColour)
-        sett.refresh()
         config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        sett.refresh(window)
         pass
 
-    def fontSizeIncrease(sett):
+    def fontSizeIncrease(sett, window):
         global fontSize
         if(int(fontSize) <= 38):
             fontSize = int(fontSize) + 2
-            sett.refresh()
             config.set('USER SETTINGS', 'fontSize', str(fontSize))
+            sett.refresh(window)
             pass
         pass
 
-    def fontSizeDecrease(sett):
+    def fontSizeDecrease(sett, window):
         global fontSize
         if(int(fontSize) >= 10):
             fontSize = int(fontSize) - 2
-            sett.refresh()
             config.set('USER SETTINGS', 'fontSize', str(fontSize))
+            sett.refresh(window)
             pass
         pass
 
-    def refresh(sett):
-        sett.destroy()
+    def refresh(sett, window):
+        sett.window.destroy()
         with open('settings.ini', 'w') as configfile:
             config.write(configfile)
-        sett.__init__()
+        settingsStart()
 
 def settingsCloseProgram(e):
     window.destroy()
@@ -633,12 +644,12 @@ def settingsStart():
         pass
 
     window.bind("<Escape>", lambda e: settingsCloseProgram(e))
-    window.bind("<P>", lambda e: settwin.fontColourRed())
-    window.bind("<O>", lambda e: settwin.fontColourGreen())
-    window.bind("<I>", lambda e: settwin.fontColourBlue())
-    window.bind("<U>", lambda e: settwin.fontColourBlack())
-    window.bind("+", lambda e: settwin.fontSizeIncrease())
-    window.bind("-", lambda e: settwin.fontSizeDecrease())
+    window.bind("<P>", lambda e: settwin.fontColourRed(window))
+    window.bind("<O>", lambda e: settwin.fontColourGreen(window))
+    window.bind("<I>", lambda e: settwin.fontColourBlue(window))
+    window.bind("<U>", lambda e: settwin.fontColourBlack(window))
+    window.bind("+", lambda e: settwin.fontSizeIncrease(window))
+    window.bind("-", lambda e: settwin.fontSizeDecrease(window))
     window.mainloop()
 
 if __name__ == '__main__':
