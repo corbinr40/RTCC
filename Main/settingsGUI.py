@@ -51,31 +51,31 @@ class Settings(Frame):
                     window_height, x_cordinate, y_cordinate))
 
         sett.settingsTitleLabel = Label(text='Settings', font=('', (int(fontSize) * (2))), fg= fontColour)
-        sett.settingsTitleLabel.grid(row=0, column=1, columnspan=2)
+        sett.settingsTitleLabel.pack(side= TOP, fill= X)
 
         sett.fontSizeLabel = Label(text='Font Size:', font=('', fontSize), fg=fontColour)
-        sett.fontSizeLabel.grid(row=1, column=0)
+        sett.fontSizeLabel.pack(row=1, column=0)
 
         sett.currentFontSizeLabel = Label(text=fontSize, font=('', fontSize), fg=fontColour)
-        sett.currentFontSizeLabel.grid(row=1, column=1)
+        sett.currentFontSizeLabel.pack(row=1, column=1)
 
         sett.fontColourLabel = Label(text='Font Colour:', font=('', fontSize), fg=fontColour)
-        sett.fontColourLabel.grid(row=2, column=0)
+        sett.fontColourLabel.pack(row=2, column=0)
 
         sett.currentFontColourLabel = Label( text=fontColour, font=('', fontSize), fg=fontColour)
-        sett.currentFontColourLabel.grid(row=2, column=1)
+        sett.currentFontColourLabel.pack(row=2, column=1)
 
         sett.wakeWordLabel = Label(text='Wake Word:', font=('', fontSize), fg=fontColour)
-        sett.wakeWordLabel.grid(row=3, column=0)
+        sett.wakeWordLabel.pack(row=3, column=0)
 
         sett.currentWakeWordLabel = Label( text=wakeWord, font=('', fontSize), fg=fontColour)
-        sett.currentWakeWordLabel.grid(row=3, column=1)
+        sett.currentWakeWordLabel.pack(row=3, column=1)
 
         sett.powerLabel = Label(text='Power', font=('', fontSize), fg=fontColour)
-        sett.powerLabel.grid(row=4, column=0)
+        sett.powerLabel.pack(row=4, column=0)
 
         sett.closeLabel = Label(text='Close', font=('', fontSize), fg=fontColour)
-        sett.closeLabel.grid(row=5, column=0)
+        sett.closeLabel.pack(row=5, column=0)
 
         #sett.pack()
     

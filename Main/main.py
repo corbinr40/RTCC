@@ -20,6 +20,9 @@ import numpy.core.multiarray
 import cv2
 import threading
 
+
+import settingsGUI as settings
+
 #Current Power Level
 if('linux' in platform.system().lower()):
     import smbus
@@ -358,7 +361,8 @@ def main():
     root.attributes("-fullscreen", True)
 
     root.bind("o", lambda e: pauseFaceDect(e))
-    root.bind("s", lambda e: print("Settings"))
+    #root.bind("s", lambda e: print("Settings"))
+    root.bind("s", lambda e: settings.settingsStart())
     #root.bind("c", lambda e:  openCommandList(ex))
     root.bind("c", lambda e:  ex.commandsList())
     root.bind("<Escape>", lambda e: closeProgram(e))
