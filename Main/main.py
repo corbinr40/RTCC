@@ -5,23 +5,41 @@
 #WHen Face detect is wanted, it will call the program.
 #When settings are wanted, it will call the settings page
 
-#from tkinter import Tk, Canvas, Frame, BOTH, Menu,
+##Main Gui Interface Modules
 import pstats
 from tkinter import *
 import datetime
 import time
-
 import platform
 
 #Modules for Face Detection
-#from tkinter import Tk, Canvas, Frame, BOTH
 from multiprocessing import Process, Queue, Pipe
 import numpy.core.multiarray
 import cv2
 import threading
 
+##Voice Detection Component
+import speech_recognition as sr
+#import datetime
+import pyjokes
+import re
 
-import settingsGUI as settings
+listener = sr.Recognizer()
+
+##Settings Interface
+import configparser
+from numpy import column_stack
+
+global fontSize
+global fontColour
+global wakeWord
+
+config = configparser.ConfigParser()
+config.read('settings.ini')
+fontSize = config['USER SETTINGS']['fontSize']
+fontColour = config['USER SETTINGS']['fontColour']
+wakeWord = config['USER SETTINGS']['wakeWord']
+#import settingsGUI as settings
 
 #Current Power Level
 if('linux' in platform.system().lower()):
@@ -81,9 +99,15 @@ class Interface(Frame):
 
         #Face Detection Specific
         
-        thread = threading.Thread(target=self.findFace, args=())
-        thread.daemon = True
-        thread.start()
+        visualThread = threading.Thread(target=self.findFace, args=())
+        visualThread.daemon = True
+        visualThread.start()
+
+        audioThread = threading.Thread(target=self.detectVoice, args=())
+        audioThread.daemon = True
+        audioThread.start()
+
+
         
         self.initUI(x1, y1, x2, y2)
 
@@ -95,6 +119,7 @@ class Interface(Frame):
         global rectFace
         global videoOn
         global voiceText
+        global audioOn
 
         #self.master.title("Face Detection")
         #self.pack(fill=BOTH, expand=1)
@@ -123,7 +148,8 @@ class Interface(Frame):
         self.currentPower()
 
         ##Recording Audio / Camera
-        audioOn = self.canvas.create_oval(620, 460, 640, 480, fill="#F85E2B", width=2)
+        #audioOn = self.canvas.create_oval(620, 460, 640, 480, fill="#F85E2B", width=2)
+        audioOn = self.canvas.create_oval(620, 460, 640, 480, fill="#000000", width=2)
         videoOn = self.canvas.create_oval(590, 460, 610, 480, fill="#000000", width=2)
 
         
@@ -237,6 +263,88 @@ class Interface(Frame):
         self.createRect(x1, y1, x2, y2)
         return (x1, y1, x2, y2)
 
+    def detectVoice(self):
+        global audioCheck
+        while True:
+            try:
+                with sr.Microphone() as source:
+                    listener.energy_threshold = 10000
+                    listener.adjust_for_ambient_noise(source, 1.2)
+                    if (audioCheck == False):
+                        #global rectFace
+                        #global voiceText
+                        global canvas
+                        global audioOn
+                        #self.canvas.delete(rectFace)
+                        #self.canvas.delete(voiceText)
+                        self.canvas.itemconfig(audioOn, fill='#000000')
+                        pass
+                    else:
+                        self.canvas.itemconfig(audioOn, fill='#F85E2B')
+                        print('listening...')
+                        voice = listener.listen(source)
+                        command = listener.recognize_google(voice)
+                        #command = listener.recognize_sphinx(voice)
+                        command = command.lower()
+                        print(command)
+                        if 'alexa' in command:
+                            command = command.replace('alexa', '')
+            ##                print(command)
+                            self.executeCommand(command)
+            except Exception as e:
+                print(e)
+                pass
+
+    def executeCommand(self, command):
+        print(command)
+        # will call the code to display the date and time
+        if 'time' in command:
+            time = datetime.datetime.now().strftime('%I:%M %p')
+            print('Current time is ' + time)
+        elif 'joke' in command:
+            print(pyjokes.get_joke())
+        # will call code for setting the text size
+        elif 'size' in command:
+            fontSize = re.sub('\D', '', command)
+            print(fontSize)
+            print(fontSize)
+        elif 'colour' in command:
+            print(command)
+            #Call method in GUI class responsible for setting the text colour
+            colours = ['red', 'blue', 'green', 'black']
+            if any(r in command for r in colours):
+                print("Found")
+            else:
+                print("Not Found")
+
+        # will call code for setting the text position
+    ##    elif 'text' and 'left' | 'text' and 'right' | 'text' and 'middle' in command:
+    ##        #Call method in Visual GUI class to set text GUI position (user speech)
+    ##        pass
+        # will call code responsible for starting the audio listening for converstion
+        elif 'conversation' and 'started' in command:
+            output = command.replace('conversation', '').replace('started', '')
+            #DisplayText(output, True)
+    # will call code responsible for stopping the audio listening for converstion
+        elif 'ended' in command:
+            output = "conversation finished"
+            #DisplayText(output, False)
+        elif 'face' and 'detection' in command:
+            #Call method to toggle face detection on/off (in visual GUI)
+            ##        if 'off' in command:
+            ##            faceDetect = False
+            ##        else:
+            ##            faceDetect = True
+            ##        faceToggle(faceDetect
+            #face.main()
+            pass
+        elif 'power' and 'down' in command:
+            print("Goodbye")
+            quit()
+        else:
+            print("Not a command")
+            print('Please repeate that command')
+
     def commandsList(self):
         #("640x480")
         global commandListActive
@@ -331,6 +439,16 @@ def pauseFaceDect(e):
         findFaces = False
         print("findFaces is False")
 
+
+def pauseAudioDect(e):
+    global audioCheck
+    if(audioCheck == False):
+        audioCheck = True
+        print("audioCheck is True")
+    else:
+        audioCheck = False
+        print("audioCheck is False")
+
 #def openCommandList(ex):
 #    commandThread = threading.Timer(5.0, ex.commandsListClose, args=())
 ##    commandThread.start()
@@ -345,9 +463,11 @@ def pauseFaceDect(e):
 def main():
     global root
     global findFaces
+    global audioCheck
     global commandListActive
     commandListActive = False
     findFaces = False
+    audioCheck = False
     
     x1 = 0
     y1 = 0
@@ -362,12 +482,164 @@ def main():
     root.attributes("-fullscreen", True)
 
     root.bind("o", lambda e: pauseFaceDect(e))
-    #root.bind("s", lambda e: print("Settings"))
-    root.bind("s", lambda e: settings.settingsStart())
+    root.bind("p", lambda e: pauseAudioDect(e))
+    root.bind("s", lambda e: settingsStart())
+    #root.bind("s", lambda e: settings.settingsStart())
     #root.bind("c", lambda e:  openCommandList(ex))
     root.bind("c", lambda e:  ex.commandsList())
     root.bind("<Escape>", lambda e: closeProgram(e))
     root.mainloop()
+
+
+## Settings Window components
+class Settings():
+
+    def __init__(sett, window):
+
+        sett.window = window
+
+        window.title("Settings")
+        window.resizable(False, False)
+
+        window_height = 700
+        window_width = 500
+
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+
+        x_cordinate = int((screen_width/2) - (window_width/2))
+        y_cordinate = int((screen_height/2) - (window_height/2))
+
+        window.geometry("{}x{}+{}+{}".format(window_width,window_height, x_cordinate, y_cordinate))
+
+        frame = Frame(sett.window)
+        frame.grid(row=0, column=0)
+
+        sett.settingsTitleLabel = Label(frame, text='Settings', font=(
+            '', (int(fontSize) * (2))), fg=fontColour)
+        sett.settingsTitleLabel.grid(row=0, column=1, columnspan=2)
+
+        sett.fontSizeLabel = Label(
+            frame, text='Font Size:', font=('', fontSize), fg=fontColour)
+        sett.fontSizeLabel.grid(row=1, column=0)
+
+        sett.currentFontSizeLabel = Label(
+            frame, text=fontSize, font=('', fontSize), fg=fontColour)
+        sett.currentFontSizeLabel.grid(row=1, column=1)
+
+        sett.fontColourLabel = Label(
+            frame, text='Font Colour:', font=('', fontSize), fg=fontColour)
+        sett.fontColourLabel.grid(row=2, column=0)
+
+        sett.currentFontColourLabel = Label(
+            frame, text=fontColour, font=('', fontSize), fg=fontColour)
+        sett.currentFontColourLabel.grid(row=2, column=1)
+
+        sett.wakeWordLabel = Label(
+            frame, text='Wake Word:', font=('', fontSize), fg=fontColour)
+        sett.wakeWordLabel.grid(row=3, column=0)
+
+        sett.currentWakeWordLabel = Label(
+            frame, text=wakeWord, font=('', fontSize), fg=fontColour)
+        sett.currentWakeWordLabel.grid(row=3, column=1)
+
+        sett.powerLabel = Label(frame, text='Power',
+                                font=('', fontSize), fg=fontColour)
+        sett.powerLabel.grid(row=4, column=0)
+
+        sett.closeLabel = Label(frame, text='Close',
+                                font=('', fontSize), fg=fontColour)
+        sett.closeLabel.grid(row=5, column=0)
+
+        #sett.grid()
+
+    def fontColourBlue(sett):
+        print("Shift I pressed for Blue")
+        global fontColour
+        fontColour = 'blue'
+        sett.currentFontColourLabel.config(text=fontColour)
+        sett.refresh()
+        config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        pass
+
+    def fontColourRed(sett):
+        print("Shift P pressed for Red")
+        global fontColour
+        fontColour = 'red'
+        sett.currentFontColourLabel.config(text=fontColour)
+        sett.refresh()
+        config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        pass
+
+    def fontColourGreen(sett):
+        print("Shift O pressed for Green")
+        global fontColour
+        fontColour = 'green'
+        sett.currentFontColourLabel.config(text=fontColour)
+        sett.refresh()
+        config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        pass
+
+    def fontColourBlack(sett):
+        print("Shift U pressed for Black")
+        global fontColour
+        fontColour = 'black'
+        sett.currentFontColourLabel.config(text=fontColour)
+        sett.refresh()
+        config.set('USER SETTINGS', 'fontColour', str(fontColour))
+        pass
+
+    def fontSizeIncrease(sett):
+        global fontSize
+        if(int(fontSize) <= 38):
+            fontSize = int(fontSize) + 2
+            sett.refresh()
+            config.set('USER SETTINGS', 'fontSize', str(fontSize))
+            pass
+        pass
+
+    def fontSizeDecrease(sett):
+        global fontSize
+        if(int(fontSize) >= 10):
+            fontSize = int(fontSize) - 2
+            sett.refresh()
+            config.set('USER SETTINGS', 'fontSize', str(fontSize))
+            pass
+        pass
+
+    def refresh(sett):
+        sett.destroy()
+        with open('settings.ini', 'w') as configfile:
+            config.write(configfile)
+        sett.__init__()
+
+def settingsCloseProgram(e):
+    window.destroy()
+
+def settingsStart():
+    global window
+    global fontSize
+    global fontColour
+    global wakeWord
+    window = Tk()
+
+    settwin = Settings(window)
+
+    print(platform.system().lower())
+
+    if('linux' in platform.system().lower()):
+        window.wm_attributes('-type', 'splash')
+    else:
+        pass
+
+    window.bind("<Escape>", lambda e: settingsCloseProgram(e))
+    window.bind("<P>", lambda e: settwin.fontColourRed())
+    window.bind("<O>", lambda e: settwin.fontColourGreen())
+    window.bind("<I>", lambda e: settwin.fontColourBlue())
+    window.bind("<U>", lambda e: settwin.fontColourBlack())
+    window.bind("+", lambda e: settwin.fontSizeIncrease())
+    window.bind("-", lambda e: settwin.fontSizeDecrease())
+    window.mainloop()
 
 if __name__ == '__main__':
     main()

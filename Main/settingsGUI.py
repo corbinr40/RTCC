@@ -16,31 +16,16 @@ fontSize = config['USER SETTINGS']['fontSize']
 fontColour = config['USER SETTINGS']['fontColour']
 wakeWord = config['USER SETTINGS']['wakeWord']
 
-#fontSize = 0
-#fontColour = ''
-#wakeWord = ''
-
-#fontSize = 24
-#fontColour = 'black'
-#wakeWord = 'alexa'
-
-
-
-
-#win.mainloop()
-
 
 class Settings():
 
     def __init__(sett, window):
-        #super().__init__()
-        #window = Tk()  # Creating instance of Tk class
 
         sett.window = window
 
 
         window.title("Settings")
-        window.resizable(False, False)  # This code helps to disable windows from resizing
+        window.resizable(False, False)
 
         window_height = 700
         window_width = 500
@@ -147,7 +132,7 @@ class Settings():
         sett.__init__()
 
 
-def closeProgram(e):
+def settingsCloseProgram(e):
     window.destroy()
 
 def settingsStart():
@@ -159,9 +144,6 @@ def settingsStart():
 
     settwin = Settings(window)
 
-    #window.wm_attributes("-topmost", True)
-    #window.attributes("-fullscreen", True)
-
     print(platform.system().lower())
 
     if('linux' in platform.system().lower()):
@@ -169,7 +151,7 @@ def settingsStart():
     else:
         pass
 
-    window.bind("<Escape>", lambda e: closeProgram(e))
+    window.bind("<Escape>", lambda e: settingsCloseProgram(e))
     window.bind("<P>", lambda e: settwin.fontColourRed())
     window.bind("<O>", lambda e: settwin.fontColourGreen())
     window.bind("<I>", lambda e: settwin.fontColourBlue())

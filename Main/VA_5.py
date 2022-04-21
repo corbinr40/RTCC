@@ -1,31 +1,31 @@
 import speech_recognition as sr
-import pyttsx3
+#import pyttsx3
 import datetime
 import pyjokes
 #import gui # import the gui file/class
 
 ##Creating an array for commands
 import re
-import sys
-import array
+#import sys
+#import array
 
 
 #from FaceGUI.py import main
 #import FaceGUI as face
 
 listener = sr.Recognizer()
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
+#engine = pyttsx3.init()
+#voices = engine.getProperty('voices')
+#engine.setProperty('voice', voices[1].id)
 
 #running = True
 
 
-def talk(text):
-    engine.say(text)
-    engine.runAndWait()
+#def talk(text):
+#    engine.say(text)
+#    engine.runAndWait()
 
-def takeCommand():
+def detectVoice():
     try:
         with sr.Microphone() as source:
             listener.energy_threshold = 10000
@@ -49,14 +49,14 @@ def executeCommand(command):
     # will call the code to display the date and time
     if 'time' in command:
         time = datetime.datetime.now().strftime('%I:%M %p')
-        talk('Current time is ' + time)
+        print('Current time is ' + time)
     elif 'joke' in command:
-        talk(pyjokes.get_joke())
+        print(pyjokes.get_joke())
     # will call code for setting the text size
     elif 'size' in command:
         fontSize = re.sub('\D', '', command)
         print(fontSize)
-        talk(fontSize)
+        print(fontSize)
     elif 'colour' in command:
         print(command)
         #Call method in GUI class responsible for setting the text colour
@@ -88,19 +88,17 @@ def executeCommand(command):
         #face.main()
         pass
     elif 'power' and 'down' in command:
-        talk("Goodbye")
+        print("Goodbye")
         quit()
-        running = False
-        sys.exit("Powering Down")
     else:
         print("Not a command")
-        talk('Please repeate that command')
+        print('Please repeate that command')
 
 if __name__ == '__main__':
     try:
         while True:
-            takeCommand()
+            detectVoice()
     except KeyboardInterrupt:
         print("Raising SystemExit")
         raise SystemExit
-    #takeCommand()
+    #detectVoice()
