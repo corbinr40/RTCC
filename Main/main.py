@@ -2,8 +2,11 @@
 
 #Starts with "GUI" to show background.
 #When Mic (or VA_5) is active, show mic icon
-#WHen Face detect is wanted, it will call the program.
+#When Face detect is wanted, it will call the program.
 #When settings are wanted, it will call the settings page
+
+##Fault Handling
+import faulthandler; faulthandler.enable()
 
 ##Main Gui Interface Modules
 import pstats
@@ -19,6 +22,7 @@ import cv2
 import threading
 
 ##Voice Detection Component
+## Added Speech to text elements as "further development"
 import speech_recognition as sr
 #import datetime
 import pyjokes
@@ -28,11 +32,13 @@ listener = sr.Recognizer()
 
 ##Settings Interface
 import configparser
-from numpy import column_stack
+from numpy import column_stack, size
 
 global fontSize
 global fontColour
 global wakeWord
+global command
+command = ''
 
 config = configparser.ConfigParser()
 config.read('settings.ini')
@@ -185,7 +191,7 @@ class Interface(Frame):
             self.currentBatteryLabel.config(text= powerLevel)
             self.currentBatteryLabel.after(1000, self.currentPower)
         else:
-            self.currentBatteryLabel.config(text="100%")
+            self.currentBatteryLabel.config(text="N/A")
 
     #Face Detect Specific
     def createRect(self,x1, y1, x2, y2):
@@ -193,11 +199,12 @@ class Interface(Frame):
         global canvas
         global voiceText
         global fontColour
+        global command
         self.canvas.delete(rectFace)
         self.canvas.delete(voiceText)
         #print("x1: " + str(x1) + " y1: " + str(y1) + " x2: " + str(x2) + " y2: " + str(y2))
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
-        voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, text="Hello")
+        voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, font=('', fontSize), text=command)
 
     def findFace(self):
         try:
@@ -266,6 +273,7 @@ class Interface(Frame):
 
     def detectVoice(self):
         global audioCheck
+        global command
         while True:
             try:
                 with sr.Microphone() as source:
@@ -288,12 +296,13 @@ class Interface(Frame):
                         #command = listener.recognize_sphinx(voice)
                         command = command.lower()
                         print(command)
-                        if 'alexa' in command:
-                            command = command.replace('alexa', '')
+                        if 'glass' in command:
+                            command = command.replace('glass', '')
             ##                print(command)
                             self.executeCommand(command)
             except Exception as e:
                 print(e)
+                ## Add GUI message to show error (i.e. Mic not found)
                 pass
 
     def executeCommand(self, command):
@@ -304,32 +313,40 @@ class Interface(Frame):
             print('Current time is ' + time)
         elif 'joke' in command:
             print(pyjokes.get_joke())
+        elif 'setting' in command:
+            #settingsStart()
+            settingsThread = threading.Thread(
+                target=settingsStart(), args=())
+            settingsThread.daemon = True
+            settingsThread.start()
+            pass
         # will call code for setting the text size
         elif 'size' in command:
             if 'increase' in command:
-                Settings.fontSizeIncrease()
+                fontSizeIncrease()
                 pass
             elif 'decrease' in command:
-                Settings.fontSizeDecrease()
+                fontSizeDecrease()
                 pass
-            fontSize = re.sub('\D', '', command)
-            print(fontSize)
+            ##Potential addition to have "custom" text sizes
+            #fontSize = re.sub('\D', '', command)
+            #print(fontSize)
         elif 'colour' in command:
             print(command)
             #Call method in GUI class responsible for setting the text colour
             colours = ['red', 'blue', 'green', 'white']
             if any(r in command for r in colours):
                 if('red' in command):
-                    Settings.fontColourRed()
+                    fontColourRed()
                     pass
                 elif('blue' in command):
-                    Settings.fontColourBlue()
+                    fontColourBlue()
                     pass
                 elif('green' in command):
-                    Settings.fontColourGreen()
+                    fontColourGreen()
                     pass
                 elif('white' in command):
-                    Settings.fontColourWhite()
+                    fontColourWhite()
                     pass
                 pass
             else:
@@ -349,8 +366,12 @@ class Interface(Frame):
             #Call method to toggle face detection on/off (in visual GUI)
             pauseFaceDect()
             pass
+        elif 'command' in command:
+            self.commandsList()
+            pass
         elif 'power' and 'down' in command:
             print("Goodbye")
+            closeProgram()
             quit()
         else:
             print("Not a command")
@@ -369,16 +390,23 @@ class Interface(Frame):
         global timeLabel
         global powerLabel
         if(commandListActive == False):
-            backgroundRec = self.canvas.create_rectangle(10, 290, 200, 470, fill="#FFFFFF")
-            commandsTitleLabel = self.canvas.create_text(100, 305, text='Commands')
-            speechLabel = self.canvas.create_text(15, 330, anchor='w', text='Speech: activate speech')
-            visionLabel = self.canvas.create_text(15, 350, anchor='w', text='Vision: activate vision')
-            settingsLabel = self.canvas.create_text(15, 370, anchor='w', text='Settings: open settings')
-            jokesLabel = self.canvas.create_text(15, 390, anchor='w', text='Jokes: want a joke?')
-            commandsLabel = self.canvas.create_text(15, 410, anchor='w', text='Commands: view commands')
-            timeLabel = self.canvas.create_text(15, 430, anchor='w', text='Time: get current time')
-            powerLabel = self.canvas.create_text(15, 450, anchor='w', text='Power: power off device')
+            global fontColour
+            if fontColour == 'white':
+                fontColour = 'black'
+
+            backgroundRec = self.canvas.create_rectangle(10, 290, 300, 470, fill="#FFFFFF")
+            commandsTitleLabel = self.canvas.create_text(100, 305, fill=fontColour, font=('', fontSize), text='Commands')
+            speechLabel = self.canvas.create_text(15, 330, anchor='w', fill=fontColour, font=('', (int(fontSize))), text='Speech: activate speech')
+            visionLabel = self.canvas.create_text(15, 350, anchor='w', fill=fontColour, font=('', fontSize), text='Vision: activate vision')
+            settingsLabel = self.canvas.create_text(15, 370, anchor='w', fill=fontColour, font=('', fontSize), text='Settings: open settings')
+            jokesLabel = self.canvas.create_text(15, 390, anchor='w', fill=fontColour, font=('', fontSize), text='Jokes: want a joke?')
+            commandsLabel = self.canvas.create_text(15, 410, anchor='w', fill=fontColour, font=('', fontSize), text='Commands: view commands')
+            timeLabel = self.canvas.create_text(15, 430, anchor='w', fill=fontColour, font=('', fontSize), text='Time: get current time')
+            powerLabel = self.canvas.create_text(15, 450, anchor='w', fill=fontColour, font=('', fontSize), text='Power: power off device')
             commandListActive = True
+
+            if fontColour == 'black':
+                fontColour = 'white'
 
             self.openCommandList()
 
@@ -431,10 +459,10 @@ class Interface(Frame):
         pass
 
 
-def closeProgram(e):
+def closeProgram():
     root.destroy()
 
-def pauseFaceDect(e):
+def pauseFaceDect():
     global findFaces
     if(findFaces == False):
         findFaces = True
@@ -444,7 +472,7 @@ def pauseFaceDect(e):
         print("findFaces is False")
 
 
-def pauseAudioDect(e):
+def pauseAudioDect():
     global audioCheck
     if(audioCheck == False):
         audioCheck = True
@@ -485,13 +513,13 @@ def main():
     #root.wm_attributes("-topmost", True)
     root.attributes("-fullscreen", True)
 
-    root.bind("o", lambda e: pauseFaceDect(e))
-    root.bind("p", lambda e: pauseAudioDect(e))
+    root.bind("o", lambda e: pauseFaceDect())
+    root.bind("p", lambda e: pauseAudioDect())
     root.bind("s", lambda e: settingsStart())
     #root.bind("s", lambda e: settings.settingsStart())
     #root.bind("c", lambda e:  openCommandList(ex))
     root.bind("c", lambda e:  ex.commandsList())
-    root.bind("<Escape>", lambda e: closeProgram(e))
+    root.bind("<Escape>", lambda e: closeProgram())
     root.mainloop()
 
 
@@ -624,6 +652,51 @@ class Settings():
             config.write(configfile)
         settingsStart()
 
+
+def fontColourBlue():
+    print("Font Colour Blue")
+    global fontColour
+    fontColour = 'blue'
+    config.set('USER SETTINGS', 'fontColour', str(fontColour))
+    pass
+
+def fontColourRed():
+    print("Font Colour Red")
+    global fontColour
+    fontColour = 'red'
+    config.set('USER SETTINGS', 'fontColour', str(fontColour))
+    pass
+
+def fontColourGreen():
+    print("Font Colour Green")
+    global fontColour
+    fontColour = 'green'
+    config.set('USER SETTINGS', 'fontColour', str(fontColour))
+    pass
+
+def fontColourWhite():
+    print("Font Colour white")
+    global fontColour
+    fontColour = 'white'
+    config.set('USER SETTINGS', 'fontColour', str(fontColour))
+    pass
+
+def fontSizeIncrease():
+    global fontSize
+    if(int(fontSize) <= 38):
+        fontSize = int(fontSize) + 2
+        config.set('USER SETTINGS', 'fontSize', str(fontSize))
+        pass
+    pass
+
+def fontSizeDecrease():
+    global fontSize
+    if(int(fontSize) >= 10):
+        fontSize = int(fontSize) - 2
+        config.set('USER SETTINGS', 'fontSize', str(fontSize))
+        pass
+    pass
+
 def settingsCloseProgram(e):
     window.destroy()
 
@@ -636,7 +709,7 @@ def settingsStart():
 
     settwin = Settings(window)
 
-    print(platform.system().lower())
+    #print(platform.system().lower())
 
     if('linux' in platform.system().lower()):
         window.wm_attributes('-type', 'splash')
@@ -647,9 +720,10 @@ def settingsStart():
     window.bind("<P>", lambda e: settwin.fontColourRed(window))
     window.bind("<O>", lambda e: settwin.fontColourGreen(window))
     window.bind("<I>", lambda e: settwin.fontColourBlue(window))
-    window.bind("<U>", lambda e: settwin.fontColourBlack(window))
+    window.bind("<U>", lambda e: settwin.fontColourWhite(window))
     window.bind("+", lambda e: settwin.fontSizeIncrease(window))
     window.bind("-", lambda e: settwin.fontSizeDecrease(window))
+
     window.mainloop()
 
 if __name__ == '__main__':
