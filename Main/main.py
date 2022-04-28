@@ -130,7 +130,8 @@ class Interface(Frame):
         #self.master.title("Face Detection")
         #self.pack(fill=BOTH, expand=1)
 
-        self.canvas = Canvas(self, width=640, height=480, background='black')
+        #self.canvas = Canvas(self, width=640, height=480, background='black')
+        self.canvas = Canvas(self)
         self.canvas.grid()
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
         voiceText = self.canvas.create_text(x1, y1, fill="#ffffff", text = "")
@@ -166,8 +167,8 @@ class Interface(Frame):
 
         #canvas = Canvas(self)
 
-        #self.canvas.configure(bg='black')
-        #self.canvas.pack(fill=BOTH, expand=1)
+        self.canvas.configure(bg='black')
+        self.canvas.pack(fill=BOTH, expand=1)
 
     def currentTime(self):
         time = datetime.datetime.now().strftime('%H:%M')
@@ -256,7 +257,7 @@ class Interface(Frame):
 
                 #Stop if escape is pressed
                 k = cv2.waitKey(30) & 0xff
-                if k == 27:
+                if(k == 27):
                     cv2.destroyAllWindows()
                     break
         except Exception as e:
@@ -279,7 +280,7 @@ class Interface(Frame):
                 with sr.Microphone() as source:
                     listener.energy_threshold = 10000
                     listener.adjust_for_ambient_noise(source, 1.2)
-                    if (audioCheck == False):
+                    if(audioCheck == False):
                         #global rectFace
                         #global voiceText
                         global canvas
@@ -296,7 +297,7 @@ class Interface(Frame):
                         #command = listener.recognize_sphinx(voice)
                         command = command.lower()
                         print(command)
-                        if 'glass' in command:
+                        if('glass' in command):
                             command = command.replace('glass', '')
             ##                print(command)
                             self.executeCommand(command)
@@ -308,12 +309,9 @@ class Interface(Frame):
     def executeCommand(self, command):
         print(command)
         # will call the code to display the date and time
-        if 'time' in command:
-            time = datetime.datetime.now().strftime('%I:%M %p')
-            print('Current time is ' + time)
-        elif 'joke' in command:
-            print(pyjokes.get_joke())
-        elif 'setting' in command:
+        if('joke' in command):
+            self.notificationShow(pyjokes.get_joke())
+        elif('setting' in command):
             #settingsStart()
             settingsThread = threading.Thread(
                 target=settingsStart(), args=())
@@ -321,61 +319,73 @@ class Interface(Frame):
             settingsThread.start()
             pass
         # will call code for setting the text size
-        elif 'size' in command:
-            if 'increase' in command:
+        elif('size' in command):
+            if('increase' in command):
                 fontSizeIncrease()
+                self.notificationShow('Font size increased')
                 pass
-            elif 'decrease' in command:
+            elif('decrease' in command):
                 fontSizeDecrease()
+                self.notificationShow('Font size decreased')
                 pass
             ##Potential addition to have "custom" text sizes
             #fontSize = re.sub('\D', '', command)
             #print(fontSize)
-        elif 'colour' in command:
+        elif('colour' in command):
             print(command)
             #Call method in GUI class responsible for setting the text colour
             colours = ['red', 'blue', 'green', 'white']
-            if any(r in command for r in colours):
+            if(any(r in command for r in colours)):
                 if('red' in command):
                     fontColourRed()
+                    self.notificationShow('Font colour set to red')
                     pass
                 elif('blue' in command):
                     fontColourBlue()
+                    self.notificationShow('Font colour set to blue')
                     pass
                 elif('green' in command):
                     fontColourGreen()
+                    self.notificationShow('Font colour set to green')
                     pass
                 elif('white' in command):
                     fontColourWhite()
+                    self.notificationShow('Font colour set to white')
                     pass
                 pass
             else:
+                self.notificationShow('Colour not supported')
                 print("Not Found")
 
         # will call code responsible for starting the audio listening for converstion
-        elif 'conversation' and 'start' in command:
+        elif('conversation' and 'start' in command):
             output = command.replace('conversation', '').replace('start', '')
             pauseAudioDect()
+            self.notificationShow('Starting audio detection')
             #DisplayText(output, True)
     # will call code responsible for stopping the audio listening for converstion
-        elif 'ended' in command:
+        elif('ended' in command):
             output = "conversation finished"
             pauseAudioDect()
+            self.notificationShow('Ending audio detection')
             #DisplayText(output, False)
-        elif 'face' and 'detection' in command:
+        elif('face' and 'detection' in command):
             #Call method to toggle face detection on/off (in visual GUI)
             pauseFaceDect()
+            self.notificationShow('Toggled face detection')
             pass
-        elif 'command' in command:
+        elif('command' in command):
             self.commandsList()
+            self.notificationShow('Showing command list')
             pass
-        elif 'power' and 'down' in command:
+        elif('power' and 'down' in command):
             print("Goodbye")
             closeProgram()
             quit()
         else:
             print("Not a command")
             print('Please repeate that command')
+            self.notificationShow('Command not found')
 
     def commandsList(self):
         #("640x480")
@@ -391,7 +401,7 @@ class Interface(Frame):
         global powerLabel
         if(commandListActive == False):
             global fontColour
-            if fontColour == 'white':
+            if(fontColour == 'white'):
                 fontColour = 'black'
 
             backgroundRec = self.canvas.create_rectangle(10, 290, 300, 470, fill="#FFFFFF")
@@ -405,7 +415,7 @@ class Interface(Frame):
             powerLabel = self.canvas.create_text(15, 450, anchor='w', fill=fontColour, font=('', fontSize), text='Power: power off device')
             commandListActive = True
 
-            if fontColour == 'black':
+            if(fontColour == 'black'):
                 fontColour = 'white'
 
             self.openCommandList()
@@ -458,6 +468,48 @@ class Interface(Frame):
 
         pass
 
+    def notificationShow(self, commandOutput):
+        global notifListActive
+        global backgroundNotifRec
+        global notifLabel
+
+        if(notifListActive == False):
+            global fontColour
+            if(fontColour == 'white'):
+                fontColour = 'black'
+#640 x 480
+            backgroundNotifRec = self.canvas.create_rectangle(
+                345, 400, 635, 450, fill="#FFFFFF")
+            notifLabel = self.canvas.create_text(
+                500, 425, fill=fontColour, font=('', fontSize), text=commandOutput)
+            notifListActive = True
+
+            if(fontColour == 'black'):
+                fontColour = 'white'
+
+            self.openNotification()
+        else:
+            self.canvas.delete(backgroundNotifRec)
+            self.canvas.delete(notifLabel)
+            notifListActive = False
+
+        pass
+
+    def openNotification(self):
+        notificationThread = threading.Timer(2.0, self.notificationClose, args=())
+        notificationThread.start()
+
+    def notificationClose(self):
+        global notifListActive
+        global backgroundNotifRec
+        global notifLabel
+        if(notifListActive == True):
+            self.canvas.delete(backgroundNotifRec)
+            self.canvas.delete(notifLabel)
+            notifListActive = False
+
+        pass
+
 
 def closeProgram():
     root.destroy()
@@ -497,7 +549,9 @@ def main():
     global findFaces
     global audioCheck
     global commandListActive
+    global notifListActive
     commandListActive = False
+    notifListActive = False
     findFaces = False
     audioCheck = False
     
@@ -511,7 +565,7 @@ def main():
     ex = Interface(x1, y1, x2, y2)
 
     #root.wm_attributes("-topmost", True)
-    root.attributes("-fullscreen", True)
+    #root.attributes("-fullscreen", True)
 
     root.bind("o", lambda e: pauseFaceDect())
     root.bind("p", lambda e: pauseAudioDect())
@@ -520,6 +574,8 @@ def main():
     #root.bind("c", lambda e:  openCommandList(ex))
     root.bind("c", lambda e:  ex.commandsList())
     root.bind("<Escape>", lambda e: closeProgram())
+
+    root.bind("f", lambda e: ex.notificationShow('Font Colour Changed'))
     root.mainloop()
 
 
