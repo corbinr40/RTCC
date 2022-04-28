@@ -211,7 +211,7 @@ The program is intended for use with voice commands, but does have them bound to
 ### Voice commands
 All voice commands require the **wake word** to activate.
 
-As default, the wake word is "***glass***"
+As default, the wake word is "***armadillo***"
 
 All commands follow the format of:
 ```
@@ -220,11 +220,11 @@ All commands follow the format of:
 
 Example:
 ```
-    glass activate face detection
+    armadillo activate face detection
 ```
 #### List of commands
 * **face detection** - Activate/Deactivate face detection
-* **voice detection** - Activate/Deactivate voice detection
+* **voice detection** - Conversation Start/Stop
 * **settings** - Show settings
 * **commands** - Show command list
 * **shut down** - Close program
@@ -364,8 +364,8 @@ def detectVoice(self):
                     command = listener.recognize_google(voice)
                     command = command.lower()
                     print(command)
-                    if('glass' in command):
-                        command = command.replace('glass', '')
+                    if('armadillo' in command):
+                        command = command.replace('armadillo', '')
                         self.executeCommand(command)
         except Exception as e:
             print(e)
@@ -717,8 +717,8 @@ while True:
                 command = listener.recognize_google(voice)
                 command = command.lower()
                 print(command)
-                if('glass' in command):
-                    command = command.replace('glass', '')
+                if('armadillo' in command):
+                    command = command.replace('armadillo', '')
                     self.executeCommand(command)
     except Exception as e:
         print(e)
@@ -776,7 +776,7 @@ elif('conversation' and 'start' in command):
     output = command.replace('conversation', '').replace('start', '')
     pauseAudioDect()
     self.notificationShow('Starting audio detection')
-elif('ended' in command):
+elif('conversation' and 'stop' in command):
     output = "conversation finished"
     pauseAudioDect()
     self.notificationShow('Ending audio detection')

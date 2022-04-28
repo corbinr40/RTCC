@@ -155,7 +155,9 @@ class Interface(Frame):
 
         self.pack(fill=BOTH, expand=1)
 
-        root.geometry("640x480")
+        #root.geometry("640x480")
+
+        root.geometry("650x520")
 
         self.canvas.configure(bg='black')
         self.canvas.pack(fill=BOTH, expand=1)
@@ -191,10 +193,20 @@ class Interface(Frame):
         global voiceText
         global fontColour
         global command
+        global audioCheck
         self.canvas.delete(rectFace)
         self.canvas.delete(voiceText)
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
-        voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, font=('', fontSize), text=command)
+
+        if(audioCheck == False):
+            global canvas
+            global audioOn
+            self.canvas.itemconfig(audioOn, fill='#000000')
+            voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, font=('', fontSize), text="")
+            pass
+        else:
+            self.canvas.itemconfig(audioOn, fill='#F85E2B')
+            voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, font=('', fontSize), text=command)
 
     def findFace(self):
         try:
@@ -263,24 +275,17 @@ class Interface(Frame):
                 with sr.Microphone() as source:
                     listener.energy_threshold = 10000
                     listener.adjust_for_ambient_noise(source, 1.2)
-                    if(audioCheck == False):
-                        global canvas
-                        global audioOn
-                        self.canvas.itemconfig(audioOn, fill='#000000')
-                        pass
-                    else:
-                        self.canvas.itemconfig(audioOn, fill='#F85E2B')
-                        print('listening...')
-                        voice = listener.listen(source)
-                        try:
-                            command = listener.recognize_google(voice)
-                        except:
-                            command = listener.recognize_sphinx(voice)
-                        command = command.lower()
-                        print(command)
-                        if('glass' in command):
-                            command = command.replace('glass', '')
-                            self.executeCommand(command)
+                    print('listening...')
+                    voice = listener.listen(source)
+                    try:
+                        command = listener.recognize_google(voice)
+                    except:
+                        command = listener.recognize_sphinx(voice)
+                    command = command.lower()
+                    print(command)
+                    if('armadillo' in command):
+                        command = command.replace('armadillo', '')
+                        self.executeCommand(command)
             except Exception as e:
                 print(e)
                 self.notificationShow("No Microphone Detected")
@@ -289,12 +294,15 @@ class Interface(Frame):
     def executeCommand(self, command):
         print(command)
         if('joke' in command):
-            self.notificationShow(pyjokes.get_joke())
+            joke = pyjokes.get_joke()
+            self.notificationShow(joke)
+            print(joke)
         elif('setting' in command):
             settingsThread = threading.Thread(
                 target=settingsStart(), args=())
             settingsThread.daemon = True
             settingsThread.start()
+            print("Settings open")
             pass
         elif('size' in command):
             if('increase' in command):
@@ -333,7 +341,7 @@ class Interface(Frame):
             output = command.replace('conversation', '').replace('start', '')
             pauseAudioDect()
             self.notificationShow('Starting audio detection')
-        elif('ended' in command):
+        elif('conversation' and 'stop' in command):
             output = "conversation finished"
             pauseAudioDect()
             self.notificationShow('Ending audio detection')
