@@ -183,12 +183,20 @@ Speech Recognition:
 3. Run the `checker.py` file
    ```sh
    python3 checker.py
+
+   or
+
+   python checker.py
    ```
 4. Once all the modules have been installed, the program can be ran
     ```sh
     cd Main/
 
     python3 main.py
+
+    or
+
+    python main.py
     ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>

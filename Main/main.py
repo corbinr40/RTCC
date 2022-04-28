@@ -5,15 +5,18 @@
 #When Face detect is wanted, it will call the program.
 #When settings are wanted, it will call the settings page
 
-##Fault Handling
-import faulthandler; faulthandler.enable()
-
 ##Main Gui Interface Modules
 import pstats
 from tkinter import *
 import datetime
 import time
 import platform
+
+##Fault Handling
+if('windows' in platform.system().lower()):
+    pass
+else:
+    import faulthandler; faulthandler.enable()
 
 #Modules for Face Detection
 from multiprocessing import Process, Queue, Pipe
@@ -129,9 +132,6 @@ class Interface(Frame):
         self.canvas.grid()
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
         voiceText = self.canvas.create_text(x1, y1, fill="#ffffff", text = "")
-
-        #self.canvas.configure(bg='black')
-        #self.canvas.pack(fill=BOTH, expand=1)
 
         ##Menu Bar Frame
         menubarFrame = LabelFrame(root, bg="white")
@@ -498,6 +498,7 @@ def main():
     root = Tk()
 
     ex = Interface(x1, y1, x2, y2)
+    root.attributes("-fullscreen", True)
 
     root.bind("o", lambda e: pauseFaceDect())
     root.bind("p", lambda e: pauseAudioDect())
