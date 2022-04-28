@@ -856,11 +856,11 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Corbin Richardson - [@corbinr40](https://twitter.com/corbinr40)
 
-Jordan Drummond Edwards <!-- - [@TWITTER](https://twitter.com/) -->
+Jordan Drummond Edwards - [@DrummondEdwards](hhttps://twitter.com/DrummondEdwards)
 
 Aryaman Anand - [@AryamanAnand](https://twitter.com/AryamanAnand)
 
-Manan Singh <!-- - [@TWITTER](https://twitter.com/) -->
+Manan Singh - [@TWITTER](https://twitter.com/)
 
 Project Link: [https://github.com/corbinr40/rtcc](https://github.com/corbinr40/rtcc)
 

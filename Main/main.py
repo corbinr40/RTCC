@@ -263,7 +263,6 @@ class Interface(Frame):
                 with sr.Microphone() as source:
                     listener.energy_threshold = 10000
                     listener.adjust_for_ambient_noise(source, 1.2)
-                    audioCheck = False
                     if(audioCheck == False):
                         global canvas
                         global audioOn
