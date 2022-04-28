@@ -88,35 +88,35 @@ RTCC is broken down into 4 main areas: audio, visual, UI, and hardware. The audi
 ## Getting Started
 There are a few dependencies for running this software. The software has been created for the *Raspberry Pi Zero W 2* but can also run on *Windows* and *Mac*.
 ### Hardware (tested)
-- [Raspberry Pi Zero W 2]()
-- [Adafruit I2S Microphone]()
-- [Raspberry Pi Camera]()
-- [Battery Pack Device]()
+- [Raspberry Pi Zero W 2](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/)
+- [Adafruit I2S Microphone](https://www.adafruit.com/product/3421)
+- [Raspberry Pi Camera](https://thepihut.com/collections/raspberry-pi-camera/products/raspberry-pi-camera-module)
+- [Battery Pack Device](https://www.waveshare.com/wiki/UPS_HAT_(C))
 
 ### Software
 
 #### Operating System (tested)
-- [Raspian OS]()
-- [MacOSX]()
-- [Windows 10]()
+- [Raspberry Pi OS](https://www.raspberrypi.com/software/operating-systems/)
+- [MacOS](https://www.apple.com/uk/macos)
+- [Windows 10](https://www.microsoft.com/en-gb/windows)
 #### Required Modules
 ##### All
-- [faulthandler]()
-- [pstats]()
-- [tkinter]()
-- [datetime]()
-- [time]()
-- [platform]()
-- [multiprocessing]()
-- [numpy]()
+- [faulthandler](https://docs.python.org/3/library/faulthandler.html)
+- [pstats](https://docs.python.org/3/library/profile.html)
+- [tkinter](https://docs.python.org/3/library/tkinter.html)
+- [datetime](https://docs.python.org/3/library/datetime.html)
+- [time](https://docs.python.org/3/library/time.html)
+- [platform](https://docs.python.org/3/library/platform.html)
+- [multiprocessing](https://docs.python.org/3/library/multiprocessing.html)
+- [numpy](https://numpy.org)
 - [OpenCV - Python](https://pypi.org/project/opencv-python/)
-- [threading]()
-- [speech recognition]()
-- [pyjokes]()
-- [re]()
-- [configparser]()
+- [threading](https://docs.python.org/3/library/threading.html)
+- [speech recognition](https://pypi.org/project/SpeechRecognition/)
+- [pyjokes](https://pypi.org/project/pyjokes/)
+- [re](https://docs.python.org/3/library/re.html)
+- [configparser](https://docs.python.org/3/library/configparser.html)
 ##### Raspian Specific
-- [smbus]()
+- [smbus](https://pypi.org/project/smbus2/)
 
 ### Prerequisites
 
