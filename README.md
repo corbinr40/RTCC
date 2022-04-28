@@ -806,6 +806,7 @@ Added UI feedback for the user when command is executed/not understood
     - [ ] Custom Offline Speech Detection Model
     - [ ] Voice Translation
     - [ ] Develop Speech Detection to be more real time
+    - [ ] Speech to text element - commands will be spoken to the user
 <!-- - [ ] Face Detection
      - [ ] Nested Feature -->
 

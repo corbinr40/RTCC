@@ -22,9 +22,9 @@ import cv2
 import threading
 
 ##Voice Detection Component
-## Added Speech to text elements as "further development"
+## Speech to text for further development
+#import pyttsx3
 import speech_recognition as sr
-#import datetime
 import pyjokes
 import re
 
@@ -45,7 +45,6 @@ config.read('settings.ini')
 fontSize = config['USER SETTINGS']['fontSize']
 fontColour = config['USER SETTINGS']['fontColour']
 wakeWord = config['USER SETTINGS']['wakeWord']
-#import settingsGUI as settings
 
 #Current Power Level
 if('linux' in platform.system().lower()):
@@ -56,7 +55,7 @@ else:
 # BUS VOLTAGE REGISTER (R)
 _REG_BUSVOLTAGE = 0x02
 
-# CALIBRATION REGISTER (R/W) #Required
+# CALIBRATION REGISTER (R/W)
 _REG_CALIBRATION = 0x05
 
 
@@ -71,7 +70,7 @@ class INA219:
         self.bus = smbus.SMBus(i2c_bus)
         self.addr = addr
 
-        # Set chip to known config values to start #Required
+        # Set chip to known config values to start
         self._cal_value = 0
 
     def read(self, address):
@@ -85,11 +84,9 @@ class INA219:
         self.bus.write_i2c_block_data(self.addr, address, temp)
 
     def set_calibration_32V_2A(self):
-
-        #Required
         self._cal_value = 4096
 
-        # Set Calibration register to 'Cal' calculated above #Required
+        # Set Calibration register to 'Cal' calculated above
         self.write(_REG_CALIBRATION, self._cal_value)
 
     def getBusVoltage_V(self):
@@ -104,17 +101,15 @@ class Interface(Frame):
         super().__init__()
 
         #Face Detection Specific
-        
         visualThread = threading.Thread(target=self.findFace, args=())
         visualThread.daemon = True
         visualThread.start()
 
+        #Voice Detection Specific
         audioThread = threading.Thread(target=self.detectVoice, args=())
         audioThread.daemon = True
         audioThread.start()
 
-
-        
         self.initUI(x1, y1, x2, y2)
 
     def initUI(self, x1, y1, x2, y2):
@@ -130,7 +125,6 @@ class Interface(Frame):
         #self.master.title("Face Detection")
         #self.pack(fill=BOTH, expand=1)
 
-        #self.canvas = Canvas(self, width=640, height=480, background='black')
         self.canvas = Canvas(self)
         self.canvas.grid()
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
@@ -142,7 +136,6 @@ class Interface(Frame):
         ##Menu Bar Frame
         menubarFrame = LabelFrame(root, bg="white")
         menubarFrame.pack(fill=X, expand=0)
-        #menubarFrame.grid(row=0, column=0)
         
         ##Time Label
         self.currentTimeLabel = Label(menubarFrame)
@@ -155,7 +148,6 @@ class Interface(Frame):
         self.currentPower()
 
         ##Recording Audio / Camera
-        #audioOn = self.canvas.create_oval(620, 460, 640, 480, fill="#F85E2B", width=2)
         audioOn = self.canvas.create_oval(620, 460, 640, 480, fill="#000000", width=2)
         videoOn = self.canvas.create_oval(590, 460, 610, 480, fill="#000000", width=2)
 
@@ -164,8 +156,6 @@ class Interface(Frame):
         self.pack(fill=BOTH, expand=1)
 
         root.geometry("640x480")
-
-        #canvas = Canvas(self)
 
         self.canvas.configure(bg='black')
         self.canvas.pack(fill=BOTH, expand=1)
@@ -180,7 +170,7 @@ class Interface(Frame):
 
             ina219 = INA219(addr=0x43)
 
-            bus_voltage = ina219.getBusVoltage_V()             # voltage on V- (load side)
+            bus_voltage = ina219.getBusVoltage_V()
             p = (bus_voltage - 3)/1.2*100
             if(p > 100):
                 p = 100
@@ -203,7 +193,6 @@ class Interface(Frame):
         global command
         self.canvas.delete(rectFace)
         self.canvas.delete(voiceText)
-        #print("x1: " + str(x1) + " y1: " + str(y1) + " x2: " + str(x2) + " y2: " + str(y2))
         rectFace = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#f11", width=2)
         voiceText = self.canvas.create_text((x2 + x1) / 2, (y2 + 25), fill=fontColour, font=('', fontSize), text=command)
 
@@ -251,9 +240,6 @@ class Interface(Frame):
                     if(foundFace == False):
                         self.canvas.delete(rectFace)
                         self.canvas.delete(voiceText)
-                    
-                #Display
-                #cv2.imshow('img', img)
 
                 #Stop if escape is pressed
                 k = cv2.waitKey(30) & 0xff
@@ -264,11 +250,8 @@ class Interface(Frame):
             #Release the VideoCapture object
             cap.release()
             print(e)
-            #camera.close()
 
     def values(self, x1, y1, x2, y2):
-        #print("X1: ", x1, " Y1: ", y1, " X2: ", x2, " Y2: ", y2)
-
         self.createRect(x1, y1, x2, y2)
         return (x1, y1, x2, y2)
 
@@ -280,45 +263,40 @@ class Interface(Frame):
                 with sr.Microphone() as source:
                     listener.energy_threshold = 10000
                     listener.adjust_for_ambient_noise(source, 1.2)
+                    audioCheck = False
                     if(audioCheck == False):
-                        #global rectFace
-                        #global voiceText
                         global canvas
                         global audioOn
-                        #self.canvas.delete(rectFace)
-                        #self.canvas.delete(voiceText)
                         self.canvas.itemconfig(audioOn, fill='#000000')
                         pass
                     else:
                         self.canvas.itemconfig(audioOn, fill='#F85E2B')
                         print('listening...')
                         voice = listener.listen(source)
-                        command = listener.recognize_google(voice)
-                        #command = listener.recognize_sphinx(voice)
+                        try:
+                            command = listener.recognize_google(voice)
+                        except:
+                            command = listener.recognize_sphinx(voice)
                         command = command.lower()
                         print(command)
                         if('glass' in command):
                             command = command.replace('glass', '')
-            ##                print(command)
                             self.executeCommand(command)
             except Exception as e:
                 print(e)
-                ## Add GUI message to show error (i.e. Mic not found)
+                self.notificationShow("No Microphone Detected")
                 pass
 
     def executeCommand(self, command):
         print(command)
-        # will call the code to display the date and time
         if('joke' in command):
             self.notificationShow(pyjokes.get_joke())
         elif('setting' in command):
-            #settingsStart()
             settingsThread = threading.Thread(
                 target=settingsStart(), args=())
             settingsThread.daemon = True
             settingsThread.start()
             pass
-        # will call code for setting the text size
         elif('size' in command):
             if('increase' in command):
                 fontSizeIncrease()
@@ -328,12 +306,8 @@ class Interface(Frame):
                 fontSizeDecrease()
                 self.notificationShow('Font size decreased')
                 pass
-            ##Potential addition to have "custom" text sizes
-            #fontSize = re.sub('\D', '', command)
-            #print(fontSize)
         elif('colour' in command):
             print(command)
-            #Call method in GUI class responsible for setting the text colour
             colours = ['red', 'blue', 'green', 'white']
             if(any(r in command for r in colours)):
                 if('red' in command):
@@ -356,21 +330,15 @@ class Interface(Frame):
             else:
                 self.notificationShow('Colour not supported')
                 print("Not Found")
-
-        # will call code responsible for starting the audio listening for converstion
         elif('conversation' and 'start' in command):
             output = command.replace('conversation', '').replace('start', '')
             pauseAudioDect()
             self.notificationShow('Starting audio detection')
-            #DisplayText(output, True)
-    # will call code responsible for stopping the audio listening for converstion
         elif('ended' in command):
             output = "conversation finished"
             pauseAudioDect()
             self.notificationShow('Ending audio detection')
-            #DisplayText(output, False)
         elif('face' and 'detection' in command):
-            #Call method to toggle face detection on/off (in visual GUI)
             pauseFaceDect()
             self.notificationShow('Toggled face detection')
             pass
@@ -388,7 +356,6 @@ class Interface(Frame):
             self.notificationShow('Command not found')
 
     def commandsList(self):
-        #("640x480")
         global commandListActive
         global backgroundRec
         global commandsTitleLabel
@@ -420,30 +387,11 @@ class Interface(Frame):
 
             self.openCommandList()
 
-            #time.sleep(1)
-        else:
-            #self.canvas.after(2000)
-
-            self.canvas.delete(backgroundRec)
-            self.canvas.delete(commandsTitleLabel)
-            self.canvas.delete(speechLabel)
-            self.canvas.delete(visionLabel)
-            self.canvas.delete(settingsLabel)
-            self.canvas.delete(jokesLabel)
-            self.canvas.delete(commandsLabel)
-            self.canvas.delete(timeLabel)
-            self.canvas.delete(powerLabel)
-            commandListActive = False
-
-        #self.canvas.after(1000, self.commandsListClose())
-        pass
-
     def openCommandList(self):
         commandThread = threading.Timer(2.0, self.commandsListClose, args=())
         commandThread.start()
 
     def commandsListClose(self):
-        #("640x480")
         global commandListActive
         global backgroundRec
         global commandsTitleLabel
@@ -477,7 +425,6 @@ class Interface(Frame):
             global fontColour
             if(fontColour == 'white'):
                 fontColour = 'black'
-#640 x 480
             backgroundNotifRec = self.canvas.create_rectangle(
                 345, 400, 635, 450, fill="#FFFFFF")
             notifLabel = self.canvas.create_text(
@@ -507,7 +454,6 @@ class Interface(Frame):
             self.canvas.delete(backgroundNotifRec)
             self.canvas.delete(notifLabel)
             notifListActive = False
-
         pass
 
 
@@ -533,17 +479,6 @@ def pauseAudioDect():
         audioCheck = False
         print("audioCheck is False")
 
-#def openCommandList(ex):
-#    commandThread = threading.Timer(5.0, ex.commandsListClose, args=())
-##    commandThread.start()
-    #commandThread.cancel()
-
-    #while(commandThread.is_alive()):
-    #    print("I'm Running!!")
-    #else:
-    #    ex.commandsListClose()
-    #    pass
-
 def main():
     global root
     global findFaces
@@ -564,18 +499,12 @@ def main():
 
     ex = Interface(x1, y1, x2, y2)
 
-    #root.wm_attributes("-topmost", True)
-    #root.attributes("-fullscreen", True)
-
     root.bind("o", lambda e: pauseFaceDect())
     root.bind("p", lambda e: pauseAudioDect())
     root.bind("s", lambda e: settingsStart())
-    #root.bind("s", lambda e: settings.settingsStart())
-    #root.bind("c", lambda e:  openCommandList(ex))
     root.bind("c", lambda e:  ex.commandsList())
     root.bind("<Escape>", lambda e: closeProgram())
-
-    root.bind("f", lambda e: ex.notificationShow('Font Colour Changed'))
+    root.bind("f", lambda e: ex.notificationShow('Notfication Check'))
     root.mainloop()
 
 
@@ -764,8 +693,6 @@ def settingsStart():
     window = Tk()
 
     settwin = Settings(window)
-
-    #print(platform.system().lower())
 
     if('linux' in platform.system().lower()):
         window.wm_attributes('-type', 'splash')
