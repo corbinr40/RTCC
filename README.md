@@ -104,6 +104,7 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -156,7 +157,6 @@ There are a few dependencies for running this software. The software has been cr
 - [numpy](https://numpy.org)
 - [OpenCV - Python](https://pypi.org/project/opencv-python/)
 - [threading](https://docs.python.org/3/library/threading.html)
-<!-- - [speech recognition](https://pypi.org/project/SpeechRecognition/) -->
 - [queue](https://docs.python.org/3/library/queue.html)
 - [sounddevice](https://pypi.org/project/sounddevice/)
 - [vosk](https://alphacephei.com/vosk/install)
