@@ -934,7 +934,7 @@ Distributed under the MIT License. See [LICENSE.txt](https://github.com/corbinr4
 
 Corbin Richardson - [@corbinr40](https://twitter.com/corbinr40)
 
-Jordan Drummond Edwards - [@DrummondEdwards](hhttps://twitter.com/DrummondEdwards)
+Jordan Drummond Edwards - [@DrummondEdwards](https://twitter.com/DrummondEdwards)
 
 Aryaman Anand - [@AryamanAnand](https://twitter.com/AryamanAnand)
 
