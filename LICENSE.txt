@@ -1,10 +1,6 @@
 MIT License
 
-<<<<<<< HEAD
 Copyright (c) 2022 Corbin Richardson, Jordan Drummond Edwards, Aryaman Anand & Manan Singh
-=======
-Copyright (c) 2022 Jordan Drummond Edwards, Corbin Richardson, Aryaman Anand & Manan Singh
->>>>>>> 2a74bfc5b31aa4eb187c6364fd82c270c8271f84
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

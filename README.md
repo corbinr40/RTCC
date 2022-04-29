@@ -156,10 +156,16 @@ There are a few dependencies for running this software. The software has been cr
 - [numpy](https://numpy.org)
 - [OpenCV - Python](https://pypi.org/project/opencv-python/)
 - [threading](https://docs.python.org/3/library/threading.html)
-- [speech recognition](https://pypi.org/project/SpeechRecognition/)
+<!-- - [speech recognition](https://pypi.org/project/SpeechRecognition/) -->
+- [queue](https://docs.python.org/3/library/queue.html)
+- [sounddevice](https://pypi.org/project/sounddevice/)
+- [vosk](https://alphacephei.com/vosk/install)
+- [sys](https://docs.python.org/3/library/sys.html)
 - [pyjokes](https://pypi.org/project/pyjokes/)
 - [re](https://docs.python.org/3/library/re.html)
 - [configparser](https://docs.python.org/3/library/configparser.html)
+
+
 ##### Raspberry OS Specific
 - [smbus](https://pypi.org/project/smbus2/)
 
@@ -171,10 +177,11 @@ These all require `pip` to be installed
     pip3 install numpy
     pip3 install opencv-python
     pip3 install pyjokes
+    pip3 install vosk
 ```
 
 #### Raspberry OS (specific)
-To get SpeechRecognition installed, PyAudio is required and installed though apt-get.
+To get Vosk installed, PyAudio is required and installed though apt-get.
 ```sh
 PyAudio:
 
@@ -184,11 +191,11 @@ PyAudio:
 
 Speech Recognition:
 
-  pip3 install SpeechRecognition
+  pip3 install vosk
 ```
 
 #### MacOS (specific)
-To get SpeechRecognition installed, PyAudio (pip) is required and PortAudio ([Homebrew]()).
+To get vosk installed, PyAudio (pip) is required and PortAudio ([Homebrew]()).
 ```sh
 PortAudio:
 
@@ -200,11 +207,11 @@ PyAudio:
 
 Speech Recognition:
 
-  pip3 install SpeechRecognition
+  pip3 install vosk
 ```
 
 #### Windows (specific)
-To get SpeechRecognition installed, [PipWin]() is required to install pyaudio.
+To get vosk installed, [PipWin]() is required to install pyaudio.
 ```powershell
 PipWin:
 
@@ -216,7 +223,7 @@ PyAudio:
 
 Speech Recognition:
 
-  pip install SpeechRecognition
+  pip install vosk
 ```
 
 ### Installation
@@ -418,6 +425,32 @@ def detectVoice(self):
 ```
 
 ![Finalised SPEECH DETECTION][finalSpeech-screenshot]
+
+This was then further developed upon to get a more "real-time" speech detection using [Vosk](https://alphacephei.com/vosk/) and one of their offline [models](https://alphacephei.com/vosk/models).
+
+```python
+def detectVoice(self):
+  global audioCheck
+  global command
+  with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=0, dtype='int16', channels=1, callback=callback):
+  rec = KaldiRecognizer(model, samplerate)
+  while True:
+    try:
+      data = q.get()
+      if rec.AcceptWaveform(data):
+        phrase = str(rec.Result()).replace('{', '').replace('}', '').replace('text', '').replace('"', '').replace(':', '')
+        if('armadillo' in phrase):
+          phrase = phrase.replace('armadillo','')
+          self.executeCommand(phrase.lower())
+        else:
+          command = str(rec.Result()).replace('{', '').replace('}', '').replace('text', '').replace('"', '').replace(':', '')
+      else:
+        command = str(rec.PartialResult()).replace('{', '').replace('}', '').replace('partial', '').replace('"', '').replace(':', '')
+    except Exception as e:
+      print(e)
+      self.notificationShow("No Microphone Detected")
+      pass
+```
 
 ### GUI Interface
 Compared different GUI libraries (TKinter and PYQT5) ultimately settled on TKinter 
@@ -890,7 +923,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See [LICENSE.txt](https://github.com/corbinr40/RTCC/blob/main/LICENSE.txt) for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -914,13 +947,13 @@ Project Link: [https://github.com/corbinr40/rtcc](https://github.com/corbinr40/r
 
 
 <!-- ACKNOWLEDGMENTS -->
-<!-- ## Acknowledgments
+## Acknowledgments
 
-* []()
-* []()
-* []()
+* [Vosk Speech Model (vosk-model-small-en-us-0.15)](https://alphacephei.com/vosk/models)
+* [Nvlabs' Flickr-Faces-HQ Dataset (FFHQ)](https://github.com/NVlabs/ffhq-dataset)
+* [Natural Images Dataset](https://www.kaggle.com/datasets/prasunroy/natural-images)
 
-<p align="right">(<a href="#top">back to top</a>)</p> -->
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 [forks-shield]: https://img.shields.io/github/forks/corbinr40/rtcc.svg?style=for-the-badge
