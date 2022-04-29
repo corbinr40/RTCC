@@ -49,16 +49,61 @@
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li>
+          <a href="#software">Software</a>
+          <ul>
+            <li><a href="#operating-system-(tested)">Operating Systems (tested)</a></li>
+            <li>
+              <a href="#required-modules">Required Modules</a>
+              <ul>
+                <li><a href="#all">All</a></li>
+                <li><a href="#raspberry-os-specific">Raspberry OS Specific</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="#prerequisites">Prerequisites</a>
+          <ul>
+            <li><a href="#all">All</a></li>
+            <li><a href="#raspberry-os-(specific)">Raspberry OS (specific)</a></li>
+            <li><a href="#macos-(specific)">MacOS (specific)</a></li>
+            <li><a href="#windows-(specific)">Windows (specific)</a></li>
+          </ul>
+        </li>
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li>
+          <a href="#voice-commands">Voice commands</a>
+          <ul>
+            <li><a href="#list-of-commands">List of commands</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#key-combines">Key combines</a>
+          <ul>
+            <li><a href="#system-wide">System Wide</a></li>
+            <li><a href="#settings-only">Settings only</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="#program-breakdown">Program Breakdown</a>
+      <ul>
+        <li><a href="#face-detection-and-training-model">Face Detection and Training Model</a></li>
+        <li><a href="#audio-component">Audio Component</a></li>
+        <li><a href="#gui-interface">GUI Interface</a></li>
+      </ul>
+    </li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -115,7 +160,7 @@ There are a few dependencies for running this software. The software has been cr
 - [pyjokes](https://pypi.org/project/pyjokes/)
 - [re](https://docs.python.org/3/library/re.html)
 - [configparser](https://docs.python.org/3/library/configparser.html)
-##### Raspian Specific
+##### Raspberry OS Specific
 - [smbus](https://pypi.org/project/smbus2/)
 
 ### Prerequisites
@@ -128,7 +173,7 @@ These all require `pip` to be installed
     pip3 install pyjokes
 ```
 
-#### Raspian (specific)
+#### Raspberry OS (specific)
 To get SpeechRecognition installed, PyAudio is required and installed though apt-get.
 ```sh
 PyAudio:
