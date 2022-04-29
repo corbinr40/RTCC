@@ -7,6 +7,7 @@
 
 ##Main Gui Interface Modules
 import pstats
+from statistics import mode
 from tkinter import *
 import datetime
 import time
@@ -18,20 +19,15 @@ if('windows' in platform.system().lower()):
 else:
     import faulthandler; faulthandler.enable()
 
+#################################
+
 #Modules for Face Detection
 from multiprocessing import Process, Queue, Pipe
 import numpy.core.multiarray
 import cv2
 import threading
 
-##Voice Detection Component
-## Speech to text for further development
-#import pyttsx3
-import speech_recognition as sr
-import pyjokes
-import re
-
-listener = sr.Recognizer()
+#################################
 
 ##Settings Interface
 import configparser
@@ -48,6 +44,39 @@ config.read('settings.ini')
 fontSize = config['USER SETTINGS']['fontSize']
 fontColour = config['USER SETTINGS']['fontColour']
 wakeWord = config['USER SETTINGS']['wakeWord']
+modelSize = config['USER SETTINGS']['model']
+
+#################################
+
+##Voice Detection Component
+## Speech to text for further development
+#import pyttsx3
+import pyjokes
+import re
+import queue
+import sounddevice as sd
+from vosk import Model, KaldiRecognizer
+import sys
+
+q = queue.Queue()
+
+def callback(indata, frames, time, status):
+    """This is called (from a separate thread) for each audio block."""
+    if status:
+        print(status, file=sys.stderr)
+    q.put(bytes(indata))
+
+device_info = sd.query_devices(0, 'input')
+samplerate = int(device_info['default_samplerate'])
+
+if(modelSize == "large"):
+    model = Model("modelLarge")
+elif(modelSize == "small"):
+    model = Model("modelSmall")
+else:
+    model = Model("modelSmall")
+
+#################################
 
 #Current Power Level
 if('linux' in platform.system().lower()):
@@ -270,26 +299,24 @@ class Interface(Frame):
     def detectVoice(self):
         global audioCheck
         global command
-        while True:
-            try:
-                with sr.Microphone() as source:
-                    listener.energy_threshold = 10000
-                    listener.adjust_for_ambient_noise(source, 1.2)
-                    print('listening...')
-                    voice = listener.listen(source)
-                    try:
-                        command = listener.recognize_google(voice)
-                    except:
-                        command = listener.recognize_sphinx(voice)
-                    command = command.lower()
-                    print(command)
-                    if('armadillo' in command):
-                        command = command.replace('armadillo', '')
-                        self.executeCommand(command)
-            except Exception as e:
-                print(e)
-                self.notificationShow("No Microphone Detected")
-                pass
+        with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=0, dtype='int16', channels=1, callback=callback):
+            rec = KaldiRecognizer(model, samplerate)
+            while True:
+                try:
+                    data = q.get()
+                    if rec.AcceptWaveform(data):
+                        phrase = str(rec.Result()).replace('{', '').replace('}', '').replace('text', '').replace('"', '').replace(':', '')
+                        if('armadillo' in phrase):
+                            phrase = phrase.replace('armadillo','')
+                            self.executeCommand(phrase.lower())
+                        else:
+                            command = str(rec.Result()).replace('{', '').replace('}', '').replace('text', '').replace('"', '').replace(':', '')
+                    else:
+                        command = str(rec.PartialResult()).replace('{', '').replace('}', '').replace('partial', '').replace('"', '').replace(':', '')
+                except Exception as e:
+                    print(e)
+                    self.notificationShow("No Microphone Detected")
+                    pass
 
     def executeCommand(self, command):
         print(command)
