@@ -317,7 +317,7 @@ The first model was a quick test one to see how well the model works. There were
     \opencv\opencv\build\x64\vc15\bin\opencv_traincascade.exe -data cascade/ -vec pos.vec -bg neg.txt -precalcValBufSize 7000 -precalcIndBufSize 7000 -numPos 700 -numNeg 1000 -numStages 5 -w 24 -h 24 -maxFalseAlarmRate 0.3 -minHitRate 0.99
 ```
 
-The next stage was to add more test and training data to make the model more accurate. (Add the code used to create along with the techniques from folder structure)
+The next stage was to add more test and training data to make the model more accurate.
 
 ![Face Detection model working without masks][faceNoMask-screenshot]
 
@@ -328,7 +328,7 @@ The next stage was to add more test and training data to make the model more acc
 ```
 
 We ran into an issue where people with masks couldn’t be recognised, so we used (mask image library) to bulk up our model. 
-Using some test code (show code) we can see how well the model worked. 
+Using some test code we can see how well the model worked. 
 
 ![Finalised Face Detection Model][finalFace-screenshot]
 
@@ -337,7 +337,7 @@ Using some test code (show code) we can see how well the model worked.
 ```
 
 ### Audio Component
-Initially we wanted to record the users speech and save it to a .wav file, then convert this to text. The initial tests of this worked. (Show code and screenshots)
+Initially we wanted to record the users speech and save it to a .wav file, then convert this to text. The initial tests of this worked.
 
 ```python
 import sounddevice as sd
