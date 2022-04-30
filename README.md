@@ -808,48 +808,36 @@ while True:
 Bound voice commands to UI changes 
 ```python
 def executeCommand(self, command):
-print(command)
 if('joke' in command):
     self.notificationShow(pyjokes.get_joke())
 elif('setting' in command):
-    settingsThread = threading.Thread(
-        target=settingsStart(), args=())
+    settingsThread = threading.Thread(target=settingsStart(), args=())
     settingsThread.daemon = True
     settingsThread.start()
-    pass
 elif('size' in command):
     if('increase' in command):
         fontSizeIncrease()
         self.notificationShow('Font size increased')
-        pass
     elif('decrease' in command):
         fontSizeDecrease()
         self.notificationShow('Font size decreased')
-        pass
 elif('colour' in command):
-    print(command)
     colours = ['red', 'blue', 'green', 'white']
     if(any(r in command for r in colours)):
         if('red' in command):
             fontColourRed()
             self.notificationShow('Font colour set to red')
-            pass
         elif('blue' in command):
             fontColourBlue()
             self.notificationShow('Font colour set to blue')
-            pass
         elif('green' in command):
             fontColourGreen()
             self.notificationShow('Font colour set to green')
-            pass
         elif('white' in command):
             fontColourWhite()
             self.notificationShow('Font colour set to white')
-            pass
-        pass
     else:
         self.notificationShow('Colour not supported')
-        print("Not Found")
 elif('conversation' and 'start' in command):
     output = command.replace('conversation', '').replace('start', '')
     pauseAudioDect()
@@ -861,18 +849,13 @@ elif('conversation' and 'stop' in command):
 elif('face' and 'detection' in command):
     pauseFaceDect()
     self.notificationShow('Toggled face detection')
-    pass
 elif('command' in command):
     self.commandsList()
     self.notificationShow('Showing command list')
-    pass
 elif('power' and 'down' in command):
-    print("Goodbye")
     closeProgram()
     quit()
 else:
-    print("Not a command")
-    print('Please repeate that command')
     self.notificationShow('Command not found')
 ```
 
@@ -938,7 +921,7 @@ Jordan Drummond Edwards - [@DrummondEdwards](https://twitter.com/DrummondEdwards
 
 Aryaman Anand - [@AryamanAnand](https://twitter.com/AryamanAnand)
 
-Manan Singh - [@TWITTER](https://twitter.com/)
+Manan Singh - [@Manan97138224](https://twitter.com/Manan97138224)
 
 Project Link: [https://github.com/corbinr40/rtcc](https://github.com/corbinr40/rtcc)
 
@@ -976,6 +959,6 @@ Project Link: [https://github.com/corbinr40/rtcc](https://github.com/corbinr40/r
 [UIFeedback-screenshot]: images/UIFeedback.png
 [UIKeyChanges-screenshot]: images/UIKeyChanges.png
 [voiceGUI-screenshot]: images/voiceGUI.png
-[voiceCommands-screenshot]: images/voiceCommands.png
+[voiceCommands-screenshot]: images/VoiceCommands.png
 [commandNotification-screenshot]: images/commandNotification.png
 [commandList-screenshot]: images/commandList.png
