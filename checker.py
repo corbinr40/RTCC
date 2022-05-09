@@ -1,6 +1,5 @@
 import platform
 
-
 if('linux' in platform.system().lower()):
     try:
         import smbus
@@ -19,6 +18,8 @@ if('linux' in platform.system().lower()):
         import datetime
         from tkinter import *
         import pstats
+
+        print("All required modules are installed!\nrun: python3 Main/main.py")
     except Exception as e:
         print(e)
 else:
@@ -38,9 +39,7 @@ else:
         import datetime
         from tkinter import *
         import pstats
+        
+        print("All required modules are installed!\nrun: python3 Main/main.py")
     except Exception as e:
         print(e)
-
-import Main.main as facedetection
-
-facedetection.main()

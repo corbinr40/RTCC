@@ -5,6 +5,11 @@
 #When Face detect is wanted, it will call the program.
 #When settings are wanted, it will call the settings page
 
+##################################################
+### sudo nano /etc/rc.local                    ###
+### add sudo python3 /home/rtcc/Main/main.py & ###
+##################################################
+
 ##Main Gui Interface Modules
 import pstats
 from statistics import mode
@@ -12,6 +17,7 @@ from tkinter import *
 import datetime
 import time
 import platform
+import os
 
 ##Fault Handling
 if('windows' in platform.system().lower()):
@@ -39,12 +45,21 @@ global wakeWord
 global command
 command = ''
 
-config = configparser.ConfigParser()
-config.read('settings.ini')
-fontSize = config['USER SETTINGS']['fontSize']
-fontColour = config['USER SETTINGS']['fontColour']
-wakeWord = config['USER SETTINGS']['wakeWord']
-modelSize = config['USER SETTINGS']['model']
+
+thisFolder = os.path.dirname(os.path.abspath(__file__))
+
+
+config = configparser.RawConfigParser()
+try:
+    config.read(os.path.join(thisFolder, 'settings.ini'))
+    #config.read(r'\settings.ini')
+    fontSize = config.get('USER SETTINGS', 'fontSize')
+    fontSize = config['USER SETTINGS']['fontSize']
+    fontColour = config['USER SETTINGS']['fontColour']
+    wakeWord = config['USER SETTINGS']['wakeWord']
+    modelSize = config['USER SETTINGS']['model']
+except Exception as e:
+    print("Settings file has not been found")
 
 #################################
 
@@ -66,15 +81,22 @@ def callback(indata, frames, time, status):
         print(status, file=sys.stderr)
     q.put(bytes(indata))
 
-device_info = sd.query_devices(0, 'input')
-samplerate = int(device_info['default_samplerate'])
+try:
+    device_info = sd.query_devices(1, 'input')
+    print(device_info)
+    samplerate = int(device_info['default_samplerate'])
+except Exception as e:
+    print("No/the incorrect microphone has been chosen.")
 
-if(modelSize == "large"):
-    model = Model("modelLarge")
-elif(modelSize == "small"):
-    model = Model("modelSmall")
-else:
-    model = Model("modelSmall")
+try:
+    if(modelSize == "large"):
+        model = Model(os.path.join(thisFolder, "modelLarge"))
+    elif(modelSize == "small"):
+        model = Model(os.path.join(thisFolder, "modelSmall"))
+    else:
+        model = Model(os.path.join(thisFolder, "modelSmall"))
+except Exception as e:
+    print("Model: " + modelSize + ", has not been found.")
 
 #################################
 
@@ -299,7 +321,8 @@ class Interface(Frame):
     def detectVoice(self):
         global audioCheck
         global command
-        with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=0, dtype='int16', channels=1, callback=callback):
+        print("Sample Rate: " + str(samplerate))
+        with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=1, dtype='int16', channels=1, callback=callback):
             rec = KaldiRecognizer(model, samplerate)
             while True:
                 try:
@@ -383,6 +406,7 @@ class Interface(Frame):
         elif('power' and 'down' in command):
             print("Goodbye")
             closeProgram()
+            os.system("sudo shutdown -h now")
             quit()
         else:
             print("Not a command")
@@ -540,6 +564,7 @@ def main():
     root.bind("c", lambda e:  ex.commandsList())
     root.bind("<Escape>", lambda e: closeProgram())
     root.bind("f", lambda e: ex.notificationShow('Notfication Check'))
+    root.bind("q", lambda e: os.system("sudo shutdown -h now"))
     root.mainloop()
 
 
