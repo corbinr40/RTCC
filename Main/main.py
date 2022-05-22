@@ -73,6 +73,9 @@ import sounddevice as sd
 from vosk import Model, KaldiRecognizer
 import sys
 
+global AudioDevice
+AudioDevice = 0
+
 q = queue.Queue()
 
 def callback(indata, frames, time, status):
@@ -82,7 +85,7 @@ def callback(indata, frames, time, status):
     q.put(bytes(indata))
 
 try:
-    device_info = sd.query_devices(1, 'input')
+    device_info = sd.query_devices(AudioDevice, 'input')
     print(device_info)
     samplerate = int(device_info['default_samplerate'])
 except Exception as e:
@@ -235,7 +238,7 @@ class Interface(Frame):
             self.currentBatteryLabel.config(text= powerLevel)
             self.currentBatteryLabel.after(1000, self.currentPower)
         else:
-            self.currentBatteryLabel.config(text="N/A")
+            self.currentBatteryLabel.config(text="Connected")
 
     #Face Detect Specific
     def createRect(self,x1, y1, x2, y2):
@@ -300,6 +303,7 @@ class Interface(Frame):
                         y2 = y + h
                         foundFace = True
                         self.values(x1, y1, x2, y2)
+                        
                     if(foundFace == False):
                         self.canvas.delete(rectFace)
                         self.canvas.delete(voiceText)
@@ -321,8 +325,9 @@ class Interface(Frame):
     def detectVoice(self):
         global audioCheck
         global command
+        global AudioDevice
         print("Sample Rate: " + str(samplerate))
-        with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=1, dtype='int16', channels=1, callback=callback):
+        with sd.RawInputStream(samplerate=samplerate, blocksize=8000, device=AudioDevice, dtype='int16', channels=1, callback=callback):
             rec = KaldiRecognizer(model, samplerate)
             while True:
                 try:
@@ -556,7 +561,7 @@ def main():
     root = Tk()
 
     ex = Interface(x1, y1, x2, y2)
-    root.attributes("-fullscreen", True)
+    #root.attributes("-fullscreen", True)
 
     root.bind("o", lambda e: pauseFaceDect())
     root.bind("p", lambda e: pauseAudioDect())
